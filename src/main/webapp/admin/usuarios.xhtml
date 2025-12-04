@@ -1,0 +1,376 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
+<h:head>
+    <title>Gestión de Usuarios - Skatelife Admin</title>
+    <meta charset="UTF-8"/>
+    <style>
+        :root {
+            --bg-main: #f8f4f0;
+            --bg-card: #ffffff;
+            --text-primary: #4a433f;
+            --text-secondary: #7c736b;
+            --border-color: #e0d9d0;
+            --primary: #2c5e76;
+            --success: #4a7c59;
+            --danger: #b74d4d;
+            --warning: #d4a142;
+            --accent: #6d4c41;
+            --input-bg: #fcfaf8;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', 'Helvetica Neue', sans-serif;
+        }
+
+        body {
+            background: var(--bg-main);
+            color: var(--text-primary);
+            display: flex;
+            min-height: 100vh;
+        }
+
+        .sidebar {
+            width: 240px;
+            background: var(--bg-card);
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 100vh;
+            padding: 24px 0;
+            border-right: 1px solid var(--border-color);
+            z-index: 1000;
+        }
+
+        .logo {
+            padding: 0 24px 24px;
+            font-weight: bold;
+            font-size: 1.4rem;
+            color: var(--primary);
+            border-bottom: 1px solid var(--border-color);
+            margin-bottom: 20px;
+        }
+
+        .nav-link {
+            display: block;
+            padding: 14px 24px;
+            color: var(--text-secondary);
+            text-decoration: none;
+            transition: all 0.2s;
+        }
+
+        .nav-link:hover, .nav-link.active {
+            background: var(--primary);
+            color: white;
+        }
+
+        .main-content {
+            margin-left: 240px;
+            padding: 32px;
+            width: calc(100% - 240px);
+        }
+
+        h1 {
+            color: var(--text-primary);
+            margin-bottom: 24px;
+            font-size: 1.8rem;
+        }
+
+        .section {
+            background: var(--bg-card);
+            padding: 28px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+            border: 1px solid var(--border-color);
+            margin-bottom: 32px;
+        }
+
+        .section-title {
+            font-size: 1.3rem;
+            color: var(--primary);
+            margin-bottom: 20px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        /* Tabla de usuarios */
+        .table-container {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            padding: 14px;
+            text-align: left;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        th {
+            background: var(--primary);
+            color: white;
+            font-weight: 600;
+        }
+
+        tr:last-child td {
+            border-bottom: none;
+        }
+
+        tr:hover {
+            background: #faf8f5;
+        }
+
+        .empty-message {
+            color: var(--text-secondary);
+            font-style: italic;
+            text-align: center;
+            padding: 24px;
+        }
+
+        .message {
+            padding: 12px;
+            border-radius: 8px;
+            margin: 16px 0;
+            font-weight: 500;
+            background: var(--success);
+            color: white;
+        }
+
+        .btn {
+            padding: 6px 12px;
+            border: none;
+            border-radius: 4px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s;
+            text-decoration: none;
+            display: inline-block;
+            margin: 0 4px;
+        }
+
+        .btn-edit {
+            background: var(--warning);
+            color: white;
+        }
+
+        .btn-edit:hover {
+            background: #c28e2d;
+        }
+
+        .btn-disable {
+            background: var(--danger);
+            color: white;
+        }
+
+        .btn-disable:hover {
+            background: #9a3d3d;
+        }
+
+        .btn-enable {
+            background: var(--success);
+            color: white;
+        }
+
+        .btn-enable:hover {
+            background: #3d6e4a;
+        }
+
+        .status-active {
+            color: var(--success);
+            font-weight: bold;
+        }
+
+        .status-disabled {
+            color: var(--danger);
+            font-weight: bold;
+        }
+
+        /* Estilo del modal */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 2000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+        }
+
+        .modal-content {
+            background-color: var(--bg-card);
+            margin: 10% auto;
+            padding: 24px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            width: 80%;
+            max-width: 500px;
+        }
+
+        .close {
+            color: var(--text-secondary);
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .close:hover {
+            color: var(--danger);
+        }
+
+        .form-group {
+            margin-bottom: 16px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 6px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        input, select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            background: var(--input-bg);
+            color: var(--text-primary);
+        }
+    </style>
+</h:head>
+<h:body>
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <div class="logo">Skatelife Admin</div>
+        <a href="dashboard.xhtml" class="nav-link">Dashboard</a>
+        <a href="productos.xhtml" class="nav-link">Gestión de Productos</a>
+        <a href="usuarios.xhtml" class="nav-link active">Gestión de Usuarios</a>
+        <a href="reportes.xhtml" class="nav-link">Reportes</a>
+    </div>
+
+    <!-- Contenido principal -->
+    <div class="main-content">
+        <h1>Gestión de Usuarios</h1>
+
+        <h:form id="mainForm">
+            <!-- Mensajes de éxito/errores -->
+            <h:messages styleClass="message" globalOnly="true" />
+
+            <!-- Sección: Lista de usuarios -->
+            <div class="section">
+                <h2 class="section-title">Usuarios Registrados</h2>
+                <div class="table-container">
+                    <h:dataTable id="tablaUsuarios" 
+                                 value="#{usuarioBean.todosLosUsuarios}" 
+                                 var="usr"
+                                 styleClass="table">
+                        <h:column>
+                            <f:facet name="header">ID</f:facet>
+                            <h:outputText value="#{usr.id}" />
+                        </h:column>
+                        <h:column>
+                            <f:facet name="header">Nombre</f:facet>
+                            <h:outputText value="#{usr.nombre}" />
+                        </h:column>
+                        <h:column>
+                            <f:facet name="header">Email</f:facet>
+                            <h:outputText value="#{usr.email}" />
+                        </h:column>
+                        <h:column>
+                            <f:facet name="header">Rol</f:facet>
+                            <h:outputText value="#{usr.rol}" />
+                        </h:column>
+                        <h:column>
+                            <f:facet name="header">Estado</f:facet>
+                            <h:outputText value="#{usr.activo ? 'Activo' : 'Deshabilitado'}" 
+                                          styleClass="#{usr.activo ? 'status-active' : 'status-disabled'}" />
+                        </h:column>
+                        <h:column>
+                            <f:facet name="header">Acciones</f:facet>
+                            <!-- Botón Editar -->
+                            <h:commandButton value="Editar" 
+                                             action="#{usuarioBean.prepararEdicion(usr)}"
+                                             styleClass="btn btn-edit"
+                                             onclick="document.getElementById('editarModal').style.display='block'; return false;"
+                                             update=":editarForm" />
+                            <!-- Botón Habilitar/Deshabilitar -->
+                            <h:commandButton value="#{usr.activo ? 'Deshabilitar' : 'Habilitar'}" 
+                                             action="#{usuarioBean.cambiarEstado(usr)}"
+                                             styleClass="btn #{usr.activo ? 'btn-disable' : 'btn-enable'}"
+                                             update=":mainForm:tablaUsuarios :mainForm" />
+                        </h:column>
+                    </h:dataTable>
+
+                    <h:panelGroup rendered="#{empty usuarioBean.todosLosUsuarios}">
+                        <div class="empty-message">No hay usuarios registrados aún.</div>
+                    </h:panelGroup>
+                </div>
+            </div>
+        </h:form>
+
+        <!-- Modal de edición -->
+        <div id="editarModal" class="modal">
+            <div class="modal-content">
+                <span class="close" onclick="document.getElementById('editarModal').style.display='none'">&times;</span>
+                <h2>Editar Usuario</h2>
+                <h:form id="editarForm">
+                    <div class="form-group">
+                        <label>Nombre</label>
+                        <h:inputText value="#{usuarioBean.usuarioSeleccionado.nombre}" 
+                                     required="true" 
+                                     styleClass="form-control" />
+                    </div>
+                    <div class="form-group">
+                        <label>Email</label>
+                        <h:inputText value="#{usuarioBean.usuarioSeleccionado.email}" 
+                                     required="true" 
+                                     styleClass="form-control" />
+                    </div>
+                    <div class="form-group">
+                        <label>Rol</label>
+                        <h:selectOneMenu value="#{usuarioBean.usuarioSeleccionado.rol}">
+                            <f:selectItem itemLabel="Cliente" itemValue="cliente" />
+                            <f:selectItem itemLabel="Administrador" itemValue="admin" />
+                        </h:selectOneMenu>
+                    </div>
+                    <div class="form-group">
+                        <label>Estado</label>
+                        <h:selectOneMenu value="#{usuarioBean.usuarioSeleccionado.activo}">
+                            <f:selectItem itemLabel="Activo" itemValue="#{true}" />
+                            <f:selectItem itemLabel="Deshabilitado" itemValue="#{false}" />
+                        </h:selectOneMenu>
+                    </div>
+                    <h:commandButton value="Guardar Cambios" 
+                                     action="#{usuarioBean.guardarEdicion}"
+                                     styleClass="btn btn-edit"
+                                     update=":mainForm:tablaUsuarios :editarForm :mainForm"
+                                     onclick="document.getElementById('editarModal').style.display='none'" />
+                    <button type="button" class="btn btn-disable" 
+                            onclick="document.getElementById('editarModal').style.display='none'">Cancelar</button>
+                </h:form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Cierra el modal si se hace clic fuera de él
+        window.onclick = function(event) {
+            var modal = document.getElementById('editarModal');
+            if (event.target === modal) {
+                modal.style.display = 'none';
+            }
+        }
+    </script>
+</h:body>
+</html>

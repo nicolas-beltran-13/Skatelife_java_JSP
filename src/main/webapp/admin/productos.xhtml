@@ -1,0 +1,284 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core">
+<h:head>
+    <title>Gestión de Productos - Skatelife Admin</title>
+    <meta charset="UTF-8"/>
+    <style>
+        :root {
+            --bg-main: #f8f4f0;
+            --bg-card: #ffffff;
+            --text-primary: #4a433f;
+            --text-secondary: #7c736b;
+            --border-color: #e0d9d0;
+            --primary: #2c5e76;
+            --success: #4a7c59;
+            --danger: #b74d4d;
+            --accent: #6d4c41;
+            --input-bg: #fcfaf8;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', 'Helvetica Neue', sans-serif;
+        }
+
+        body {
+            background: var(--bg-main);
+            color: var(--text-primary);
+            display: flex;
+            min-height: 100vh;
+        }
+
+        .sidebar {
+            width: 240px;
+            background: var(--bg-card);
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 100vh;
+            padding: 24px 0;
+            border-right: 1px solid var(--border-color);
+            z-index: 1000;
+        }
+
+        .logo {
+            padding: 0 24px 24px;
+            font-weight: bold;
+            font-size: 1.4rem;
+            color: var(--primary);
+            border-bottom: 1px solid var(--border-color);
+            margin-bottom: 20px;
+        }
+
+        .nav-link {
+            display: block;
+            padding: 14px 24px;
+            color: var(--text-secondary);
+            text-decoration: none;
+            transition: all 0.2s;
+        }
+
+        .nav-link:hover, .nav-link.active {
+            background: var(--primary);
+            color: white;
+        }
+
+        .main-content {
+            margin-left: 240px;
+            padding: 32px;
+            width: calc(100% - 240px);
+        }
+
+        h1 {
+            color: var(--text-primary);
+            margin-bottom: 24px;
+            font-size: 1.8rem;
+        }
+
+        .section {
+            background: var(--bg-card);
+            padding: 28px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+            border: 1px solid var(--border-color);
+            margin-bottom: 32px;
+        }
+
+        .section-title {
+            font-size: 1.3rem;
+            color: var(--primary);
+            margin-bottom: 20px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        /* Formulario */
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: var(--text-primary);
+            font-size: 0.95rem;
+        }
+
+        input, select, textarea {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            background: var(--input-bg);
+            color: var(--text-primary);
+        }
+
+        .btn {
+            padding: 10px 20px;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .btn:hover {
+            background: #1e455a;
+        }
+
+        /* Tabla de productos */
+        .table-container {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            padding: 14px;
+            text-align: left;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        th {
+            background: var(--primary);
+            color: white;
+            font-weight: 600;
+        }
+
+        tr:last-child td {
+            border-bottom: none;
+        }
+
+        tr:hover {
+            background: #faf8f5;
+        }
+
+        .empty-message {
+            color: var(--text-secondary);
+            font-style: italic;
+            text-align: center;
+            padding: 24px;
+        }
+
+        .message {
+            padding: 12px;
+            border-radius: 8px;
+            margin: 16px 0;
+            font-weight: 500;
+            background: var(--success);
+            color: white;
+        }
+    </style>
+</h:head>
+<h:body>
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <div class="logo">Skatelife Admin</div>
+        <a href="dashboard.xhtml" class="nav-link">Dashboard</a>
+        <a href="productos.xhtml" class="nav-link active">Gestión de Productos</a>
+        <a href="#" class="nav-link">Reportes</a>
+        <a href="#" class="nav-link">Usuarios</a>
+    </div>
+
+    <!-- Contenido principal -->
+    <div class="main-content">
+        <h1>Gestión de Productos</h1>
+
+        <h:form id="mainForm">
+            <!-- Mensajes de éxito/errores -->
+            <h:messages styleClass="message" globalOnly="true" />
+
+            <!-- Sección 1: Formulario para agregar -->
+            <div class="section">
+                <h2 class="section-title">Agregar Nuevo Producto</h2>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>Nombre</label>
+                        <h:inputText value="#{productoBean.nombre}" 
+                                     required="true"
+                                     styleClass="form-control" />
+                    </div>
+                    <div class="form-group">
+                        <label>Categoría</label>
+                        <h:selectOneMenu value="#{productoBean.categoria}" required="true">
+                            <f:selectItem itemLabel="Selecciona..." noSelectionOption="true" />
+                            <f:selectItem itemLabel="Tablas" itemValue="tablas" />
+                            <f:selectItem itemLabel="Ruedas" itemValue="ruedas" />
+                            <f:selectItem itemLabel="Ropa" itemValue="ropa" />
+                            <f:selectItem itemLabel="Accesorios" itemValue="accesorios" />
+                        </h:selectOneMenu>
+                    </div>
+                    <div class="form-group">
+                        <label>Precio (COP)</label>
+                        <h:inputText value="#{productoBean.precio}" 
+                                     type="number" required="true" />
+                    </div>
+                    <div class="form-group">
+                        <label>Stock</label>
+                        <h:inputText value="#{productoBean.stock}" 
+                                     type="number" required="true" />
+                    </div>
+                </div>
+                <h:commandButton value="Agregar Producto" 
+                                 action="#{productoBean.guardar}" 
+                                 styleClass="btn"
+                                 />
+            </div>
+
+            <!-- Sección 2: Lista de productos -->
+            <div class="section">
+                <h2 class="section-title">Productos Registrados</h2>
+                <div class="table-container">
+                    <h:dataTable id="tablaProductos" 
+                                 value="#{productoBean.todosLosProductos}" 
+                                 var="prod"
+                                 styleClass="table">
+                        <h:column>
+                            <f:facet name="header">ID</f:facet>
+                            <h:outputText value="#{prod.id}" />
+                        </h:column>
+                        <h:column>
+                            <f:facet name="header">Nombre</f:facet>
+                            <h:outputText value="#{prod.nombre}" />
+                        </h:column>
+                        <h:column>
+                            <f:facet name="header">Categoría</f:facet>
+                            <h:outputText value="#{prod.categoria}" />
+                        </h:column>
+                        <h:column>
+                            <f:facet name="header">Precio</f:facet>
+                            <!-- ✅ Corregido: se eliminó converter="javax.faces.Number" -->
+                            <h:outputText value="#{prod.precio}"/>
+                        </h:column>
+                        <h:column>
+                            <f:facet name="header">Stock</f:facet>
+                            <h:outputText value="#{prod.stock}" />
+                        </h:column>
+                    </h:dataTable>
+
+                    <h:panelGroup rendered="#{empty productoBean.todosLosProductos}">
+                        <div class="empty-message">No hay productos registrados aún.</div>
+                    </h:panelGroup>
+                </div>
+            </div>
+        </h:form>
+    </div>
+</h:body>
+</html>
