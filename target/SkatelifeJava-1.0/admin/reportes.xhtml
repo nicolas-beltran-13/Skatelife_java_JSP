@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml"
-      xmlns:h="http://xmlns.jcp.org/jsf/html">
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core">
 <h:head>
     <title>Reportes - Skatelife Admin</title>
     <meta charset="UTF-8"/>
@@ -131,10 +132,27 @@
             transition: background 0.2s;
             text-decoration: none;
             display: inline-block;
+            margin: 0 6px; /* Espacio entre botones */
         }
 
         .btn:hover {
             background: #1e455a;
+        }
+
+        .btn-success {
+            background: var(--success);
+        }
+
+        .btn-success:hover {
+            background: #3a684a;
+        }
+
+        .btn-warning {
+            background: var(--warning);
+        }
+
+        .btn-warning:hover {
+            background: #c0902d;
         }
     </style>
 </h:head>
@@ -174,12 +192,24 @@
             </div>
         </div>
 
-        <div class="report-card">
-            <h2 class="report-title">Acciones Disponibles</h2>
-            <a href="#" class="btn">Generar Reporte de Ventas</a>
-            <a href="#" class="btn" style="background: var(--success); margin-left: 12px;">Exportar a PDF</a>
-            <a href="#" class="btn" style="background: var(--warning); margin-left: 12px;">Exportar a Excel</a>
-        </div>
+        <!-- Formulario para agrupar los botones JSF -->
+        <h:form>
+            <div class="report-card">
+                <h2 class="report-title">Acciones Disponibles</h2>
+                <!-- Botón Generar Reporte de Ventas -->
+                <h:commandButton value="Generar Reporte de Ventas"
+                                 action="#{reporteBean.generarReporteVentas}"
+                                 styleClass="btn" />
+                <!-- Botón Exportar a PDF -->
+                <h:commandButton value="Exportar a PDF"
+                                 action="#{reporteBean.exportarPDF}"
+                                 styleClass="btn btn-success" />
+                <!-- Botón Exportar a Excel -->
+                <h:commandButton value="Exportar a Excel"
+                                 action="#{reporteBean.exportarExcel}"
+                                 styleClass="btn btn-warning" />
+            </div>
+        </h:form>
     </div>
 </h:body>
 </html>

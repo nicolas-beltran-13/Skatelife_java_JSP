@@ -1,4 +1,5 @@
 com\mycompany\beans\UsuarioBean$Usuario.class
 com\mycompany\beans\UsuarioBean.class
+com\mycompany\beans\ReporteBean.class
 com\mycompany\beans\ProductoBean.class
 com\mycompany\beans\ProductoBean$Producto.class
