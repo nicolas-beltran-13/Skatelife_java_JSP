@@ -1,5 +1,9 @@
-com\mycompany\beans\UsuarioBean$Usuario.class
-com\mycompany\beans\UsuarioBean.class
 com\mycompany\beans\ReporteBean.class
+com\mycompany\skatelifejava\ConexionBD.class
+com\mycompany\daos\ProductoDao.class
+com\skatelife\dao\UsuarioDAO.class
+com\mycompany\Dao\ReporteDao.class
+com\skatelife\model\Usuario.class
 com\mycompany\beans\ProductoBean.class
 com\mycompany\beans\ProductoBean$Producto.class
+com\skatelife\bean\UsuarioBean.class

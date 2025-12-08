@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html">
+<h:head>
+    <title>Dashboard Administrativo - Skatelife</title>
+    <meta charset="UTF-8"/>
+       <h:outputStylesheet library="css" name="admin.css"/>
+</h:head>
+<h:body>
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <div class="logo">Skatelife Admin</div>
+        <a href="panel_admin.xhtml" class="nav-link active">Panel</a>
+        <a href="productos.xhtml" class="nav-link">Agregar Producto</a>
+        <a href="reportes.xhtml" class="nav-link">Reportes</a>
+        <a href="usuarios.xhtml" class="nav-link">Usuarios</a>
+    </div>
+
+    <!-- Contenido principal -->
+    <div class="main-content">
+        <h1>Dashboard Administrativo</h1>
+
+        <!-- Tarjetas de estadísticas -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-icon stat-blue">📦</div>
+                <div class="stat-info">
+                    <h3>Total Productos</h3>
+                    <div class="value">42</div>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon stat-green">💰</div>
+                <div class="stat-info">
+                    <h3>Valor Inventario</h3>
+                    <div class="value">$525.000</div>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon stat-yellow">⚠️</div>
+                <div class="stat-info">
+                    <h3>Stock Bajo</h3>
+                    <div class="value">3</div>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon stat-purple">🏷️</div>
+                <div class="stat-info">
+                    <h3>Categorías</h3>
+                    <div class="value">5</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Acciones -->
+        <div class="actions-grid">
+            <div class="action-card">
+                <div class="action-icon action-red">📦</div>
+                <div class="action-info">
+                    <h3>Gestión de Productos</h3>
+                    <p>Agregar, editar y eliminar productos</p>
+                    <a href="productos.xhtml" class="action-link">Ir a Productos</a>
+                </div>
+            </div>
+            <div class="action-card">
+                <div class="action-icon action-red">📊</div>
+                <div class="action-info">
+                    <h3>Reportes y Estadísticas</h3>
+                    <p>Generar reportes detallados</p>
+                    <a href="#" class="action-link">Ver Reportes</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Actividad reciente -->
+        <div class="activity-section">
+            <h2>Actividad Reciente</h2>
+            <div class="activity-item">
+                <div class="activity-icon activity-green">+</div>
+                <div class="activity-text">
+                    <h4>Nuevo producto agregado</h4>
+                    <span>Hace 2 horas</span>
+                </div>
+            </div>
+            <div class="activity-item">
+                <div class="activity-icon activity-blue">✏️</div>
+                <div class="activity-text">
+                    <h4>Producto actualizado</h4>
+                    <span>Hace 5 horas</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</h:body>
+</html>

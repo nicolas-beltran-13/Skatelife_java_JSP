@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core">
+<h:head>
+    <title>Reportes - Skatelife Admin</title>
+    <meta charset="UTF-8"/>
+    <!-- Enlazar con el archivo de estilos CSS -->
+    <h:outputStylesheet library="css" name="admin.css"/>
+</h:head>
+
+<h:body>
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <div class="logo">Skatelife Admin</div>
+        <a href="panel_admin.xhtml" class="nav-link">Panel Principal</a>
+        <a href="productos.xhtml" class="nav-link">Gestión de Productos</a>
+        <a href="usuarios.xhtml" class="nav-link">Gestión de Usuarios</a>
+        <a href="reportes.xhtml" class="nav-link active">Reportes</a>
+    </div>
+
+    <!-- Contenido principal -->
+    <div class="main-content">
+        <h1>Reportes del Sistema</h1>
+
+        <!-- Tarjeta de resumen general -->
+        <div class="report-card">
+            <h2 class="report-title">Resumen General</h2>
+            <div class="report-stats">
+                <div class="stat-box">
+                    <div class="stat-value">42</div>
+                    <div class="stat-label">Productos</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-value">125</div>
+                    <div class="stat-label">Usuarios</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-value">$525.000</div>
+                    <div class="stat-label">Ventas Totales</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-value">18</div>
+                    <div class="stat-label">Órdenes</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Formulario con botones para generar y exportar reportes -->
+        <h:form>
+            <div class="report-card">
+                <h2 class="report-title">Acciones Disponibles</h2>
+                <!-- Botón Generar Reporte de Ventas -->
+                <h:commandButton value="Generar Reporte de Ventas"
+                                 action="#{reporteBean.generarReporteVentas}"
+                                 styleClass="btn" />
+                <!-- Botón Exportar a PDF -->
+                <h:commandButton value="Exportar a PDF"
+                                 action="#{reporteBean.exportarPDF}"
+                                 styleClass="btn btn-success" />
+                <!-- Botón Exportar a Excel -->
+                <h:commandButton value="Exportar a Excel"
+                                 action="#{reporteBean.exportarExcel}"
+                                 styleClass="btn btn-warning" />
+            </div>
+        </h:form>
+    </div>
+</h:body>
+</html>

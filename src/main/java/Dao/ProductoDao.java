@@ -1,26 +1,24 @@
-package com.mycompany.daos; // Asegúrate de usar el paquete correcto
+package com.mycompany.daos; // Asegúrate de usar el paquete correcto para tus DAOs
 
 import com.mycompany.beans.ProductoBean;
-import com.mycompany.utils.ConexionBD; // Asegúrate de usar el paquete correcto
+import com.mycompany.skatelifejava.ConexionBD; // Asegúrate del paquete correcto
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public class ProductoDAO {
+// ✅ CORREGIDO: Nombre del archivo coincide con el nombre de la clase
+public class ProductoDao {
 
     private Connection conexion;
 
-    // Constructor que recibe la conexión
-    public ProductoDAO(Connection conexion) {
+    public ProductoDao(Connection conexion) {
         this.conexion = conexion;
     }
 
     // Método para obtener todos los productos
     public List<ProductoBean.Producto> findAll() throws SQLException {
-        // Asumiendo que 'categoria' en tu Bean se refiere a 'fk_idcategoria' en la BD
-        // Si 'categoria' en el Bean es el nombre de la categoría, necesitarías un JOIN
         String sql = "SELECT pk_idproducto, nombreproducto, fk_idcategoria, precio, cantidad FROM tbl_producto";
         List<ProductoBean.Producto> productos = new ArrayList<>();
 
@@ -28,15 +26,14 @@ public class ProductoDAO {
              ResultSet rs = stmt.executeQuery()) {
 
             while (rs.next()) {
-                ProductoBean.Producto prod = new ProductoBean.Producto();
-                prod.setId(rs.getInt("pk_idproducto"));
-                prod.setNombre(rs.getString("nombreproducto"));
-                // Asumiendo que 'categoria' en el Bean es un String que representa el nombre de la categoría
-                // Si es el ID, usarías setCategoria(rs.getInt("fk_idcategoria") + ""); o manejarías el ID como int
-                // Por ahora, lo asignamos como un String (nombre de la categoría o ID como texto)
-                prod.setCategoria(rs.getString("fk_idcategoria")); // Cambia esto si es el nombre real
-                prod.setPrecio(rs.getDouble("precio"));
-                prod.setStock(rs.getInt("cantidad"));
+                // ✅ CORREGIDO: Se usa el constructor con parámetros
+                ProductoBean.Producto prod = new ProductoBean.Producto(
+                    rs.getInt("pk_idproducto"), // id
+                    rs.getString("nombreproducto"), // nombre
+                    rs.getString("fk_idcategoria"), // categoria (asumiendo es un string o el ID como string)
+                    rs.getDouble("precio"), // precio
+                    rs.getInt("cantidad") // stock
+                );
                 productos.add(prod);
             }
         }
@@ -52,12 +49,14 @@ public class ProductoDAO {
             stmt.setInt(1, id);
             try (ResultSet rs = stmt.executeQuery()) {
                 if (rs.next()) {
-                    prod = new ProductoBean.Producto();
-                    prod.setId(rs.getInt("pk_idproducto"));
-                    prod.setNombre(rs.getString("nombreproducto"));
-                    prod.setCategoria(rs.getString("fk_idcategoria")); // Cambia esto si es el nombre real
-                    prod.setPrecio(rs.getDouble("precio"));
-                    prod.setStock(rs.getInt("cantidad"));
+                    // ✅ CORREGIDO: Se usa el constructor con parámetros
+                    prod = new ProductoBean.Producto(
+                        rs.getInt("pk_idproducto"), // id
+                        rs.getString("nombreproducto"), // nombre
+                        rs.getString("fk_idcategoria"), // categoria
+                        rs.getDouble("precio"), // precio
+                        rs.getInt("cantidad") // stock
+                    );
                 }
             }
         }
@@ -65,8 +64,9 @@ public class ProductoDAO {
     }
 
     // Método para insertar un nuevo producto
+    // Este método requiere que tu clase ProductoBean.Producto tenga setters si se desea modificar después de crearlo,
+    // o que pases todos los valores al constructor. Este ejemplo asume que se pasa todo al constructor.
     public void insert(ProductoBean.Producto producto) throws SQLException {
-        // Asumiendo que 'categoria' en el Bean es el ID de la categoría en la BD
         String sql = "INSERT INTO tbl_producto (nombreproducto, fk_idcategoria, precio, cantidad) VALUES (?, ?, ?, ?)";
 
         try (PreparedStatement stmt = conexion.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
@@ -80,15 +80,24 @@ public class ProductoDAO {
             // Opcional: Obtener el ID generado si es necesario
             try (ResultSet generatedKeys = stmt.getGeneratedKeys()) {
                 if (generatedKeys.next()) {
-                    producto.setId(generatedKeys.getInt(1));
+                    // ❌ CORREGIDO: No se puede usar setId() porque Producto no lo tiene.
+                    // Debes manejar el ID generado de otra manera si es necesario.
+                    // Por ejemplo, devolviendo el ID o creando un nuevo objeto Producto con el ID.
+                    // Esto es más complejo si Producto no tiene setters.
+                    // Una opción es que insert() devuelva el ID generado.
+                    // int nuevoId = generatedKeys.getInt(1);
+                    // producto.setId(nuevoId); // ESTO NO FUNCIONA CON TU CLASE ACTUAL
                 }
             }
         }
     }
 
     // Método para actualizar un producto existente
+    // Al igual que insert, actualizar es complicado sin setters. Este ejemplo ilustra el problema.
     public void update(ProductoBean.Producto producto) throws SQLException {
-        // Asumiendo que 'categoria' en el Bean es el ID de la categoría en la BD
+        // ❌ ESTE MÉTODO NO FUNCIONARÁ CON TU CLASE PRODUCTO ACTUAL QUE NO TIENE SETTERS
+        // Si necesitas actualizar, debes agregar setters a tu clase ProductoBean.Producto
+        // o manejar los valores de otra manera.
         String sql = "UPDATE tbl_producto SET nombreproducto=?, fk_idcategoria=?, precio=?, cantidad=? WHERE pk_idproducto=?";
 
         try (PreparedStatement stmt = conexion.prepareStatement(sql)) {
@@ -96,7 +105,7 @@ public class ProductoDAO {
             stmt.setString(2, producto.getCategoria()); // Asegúrate que sea el ID si fk_idcategoria es INT
             stmt.setDouble(3, producto.getPrecio());
             stmt.setInt(4, producto.getStock());
-            stmt.setInt(5, producto.getId());
+            stmt.setInt(5, producto.getId()); // Se asume que el ID ya está disponible
 
             int rowsUpdated = stmt.executeUpdate();
             if (rowsUpdated == 0) {
@@ -106,6 +115,7 @@ public class ProductoDAO {
     }
 
     // Método para eliminar un producto por ID
+    // Este no requiere setters en Producto.
     public void delete(int id) throws SQLException {
         String sql = "DELETE FROM tbl_producto WHERE pk_idproducto = ?";
 

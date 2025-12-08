@@ -1,58 +1,170 @@
-package com.mycompany.beans;
+package com.skatelife.bean;
 
+import com.skatelife.dao.UsuarioDAO;
+import com.skatelife.model.Usuario;
 import jakarta.annotation.PostConstruct;
-import jakarta.enterprise.context.SessionScoped;
+import jakarta.ejb.EJB;
 import jakarta.faces.application.FacesMessage;
-import jakarta.faces.context.FacesContext;
+import jakarta.faces.view.ViewScoped;
 import jakarta.inject.Named;
+import jakarta.faces.context.FacesContext;
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
-@Named
-@SessionScoped
+@Named(value = "usuarioBean")
+@ViewScoped
 public class UsuarioBean implements Serializable {
 
-    private List<Usuario> usuarios = new ArrayList<>();
-    private Usuario usuarioSeleccionado; // Para manejar la edición
+    @EJB
+    private UsuarioDAO usuarioDAO;
+
+    private List<Usuario> usuarios;
+    private Usuario usuarioSeleccionado;
+    private Usuario nuevoUsuario;
+    private String busqueda = "";
 
     @PostConstruct
     public void init() {
-        if (usuarios.isEmpty()) {
-            usuarios.add(new Usuario(1, "Juan Pérez", "juan@example.com", "cliente", true));
-            usuarios.add(new Usuario(2, "Ana Gómez", "ana@example.com", "admin", false)); // Deshabilitada
-            usuarios.add(new Usuario(3, "Luis Martínez", "luis@example.com", "cliente", true));
+        cargarUsuarios();
+        nuevoUsuario = new Usuario();
+    }
+
+    // Cargar todos los usuarios
+    public void cargarUsuarios() {
+        try {
+            usuarios = usuarioDAO.findAll();
+
+            // Si hay búsqueda, filtrar resultados
+            if (busqueda != null && !busqueda.trim().isEmpty()) {
+                usuarios = usuarios.stream()
+                    .filter(u ->
+                        (u.getUsername() != null && u.getUsername().toLowerCase().contains(busqueda.toLowerCase())) ||
+                        (u.getCorreo() != null && u.getCorreo().toLowerCase().contains(busqueda.toLowerCase())) ||
+                        (u.getNombre() != null && u.getNombre().toLowerCase().contains(busqueda.toLowerCase())) ||
+                        (u.getApellido() != null && u.getApellido().toLowerCase().contains(busqueda.toLowerCase()))
+                    )
+                    .collect(Collectors.toList());
+            }
+
+        } catch (Exception e) {
+            mostrarMensaje("Error", "No se pudieron cargar los usuarios: " + e.getMessage(),
+                    FacesMessage.SEVERITY_ERROR);
         }
     }
 
-    // Método para cambiar el estado (activo/inactivo) de un usuario
-    public String cambiarEstado(Usuario usuario) {
-        usuario.setActivo(!usuario.isActivo()); // Invierte el estado
-        String nuevoEstado = usuario.isActivo() ? "habilitado" : "deshabilitado";
-        FacesContext.getCurrentInstance().addMessage(null,
-            new FacesMessage(FacesMessage.SEVERITY_INFO,
-                "✅ Usuario " + nuevoEstado, "El estado del usuario '" + usuario.getNombre() + "' ha sido actualizado."));
-        return null;
-    }
-
-    // Método para preparar la edición (carga el usuario seleccionado)
-    public String prepararEdicion(Usuario usuario) {
+    // Preparar para editar
+    public void prepararEdicion(Usuario usuario) {
         this.usuarioSeleccionado = usuario;
-        return null;
     }
 
-    // Método para guardar los cambios del usuario editado
-    public String guardarEdicion() {
-        if (usuarioSeleccionado != null) {
-            FacesContext.getCurrentInstance().addMessage(null,
-                new FacesMessage(FacesMessage.SEVERITY_INFO,
-                    "✅ Usuario actualizado", "Los datos del usuario '" + usuarioSeleccionado.getNombre() + "' han sido guardados."));
+    // Actualizar solo el rol
+    public void actualizarRol() {
+        try {
+            usuarioDAO.update(usuarioSeleccionado);
+            cargarUsuarios();
+            mostrarMensaje("Éxito", "Rol actualizado correctamente",
+                    FacesMessage.SEVERITY_INFO);
+            usuarioSeleccionado = null;
+        } catch (Exception e) {
+            mostrarMensaje("Error", "No se pudo actualizar el rol: " + e.getMessage(),
+                    FacesMessage.SEVERITY_ERROR);
         }
-        return null;
     }
 
-    public List<Usuario> getTodosLosUsuarios() {
+    // Actualizar usuario completo
+    public void actualizarUsuario() {
+        try {
+            if (usuarioSeleccionado.getUsername() == null ||
+                usuarioSeleccionado.getUsername().trim().isEmpty()) {
+                mostrarMensaje("Error", "El nombre de usuario es obligatorio",
+                        FacesMessage.SEVERITY_WARN);
+                return;
+            }
+
+            usuarioDAO.update(usuarioSeleccionado);
+            cargarUsuarios();
+            mostrarMensaje("Éxito", "Usuario actualizado correctamente",
+                    FacesMessage.SEVERITY_INFO);
+            usuarioSeleccionado = null;
+
+        } catch (Exception e) {
+            mostrarMensaje("Error", "No se pudo actualizar el usuario: " + e.getMessage(),
+                    FacesMessage.SEVERITY_ERROR);
+        }
+    }
+
+    // Eliminar usuario
+    public void eliminarUsuario(Usuario usuario) {
+        try {
+            usuarioDAO.delete(usuario.getId());
+            cargarUsuarios();
+            mostrarMensaje("Éxito", "Usuario eliminado correctamente",
+                    FacesMessage.SEVERITY_INFO);
+        } catch (Exception e) {
+            mostrarMensaje("Error", "No se pudo eliminar el usuario: " + e.getMessage(),
+                    FacesMessage.SEVERITY_ERROR);
+        }
+    }
+
+    // Crear un usuario nuevo
+    public void crearUsuario() {
+        try {
+
+            if (usuarioDAO.existeUsername(nuevoUsuario.getUsername())) {
+                mostrarMensaje("Error", "El nombre de usuario ya existe",
+                        FacesMessage.SEVERITY_WARN);
+                return;
+            }
+
+            if (usuarioDAO.existeEmail(nuevoUsuario.getCorreo())) {
+                mostrarMensaje("Error", "El email ya está registrado",
+                        FacesMessage.SEVERITY_WARN);
+                return;
+            }
+
+            usuarioDAO.create(nuevoUsuario);
+            cargarUsuarios();
+            nuevoUsuario = new Usuario();
+
+            mostrarMensaje("Éxito", "Usuario creado correctamente",
+                    FacesMessage.SEVERITY_INFO);
+
+        } catch (Exception e) {
+            mostrarMensaje("Error", "No se pudo crear el usuario: " + e.getMessage(),
+                    FacesMessage.SEVERITY_ERROR);
+        }
+    }
+
+    // Cancelar edición
+    public void cancelarEdicion() {
+        usuarioSeleccionado = null;
+    }
+
+    // Aplicar filtro de búsqueda
+    public void aplicarFiltros() {
+        cargarUsuarios();
+    }
+
+    // Limpiar búsqueda
+    public void limpiarFiltros() {
+        busqueda = "";
+        cargarUsuarios();
+    }
+
+    // Mostrar mensajes
+    private void mostrarMensaje(String titulo, String mensaje, FacesMessage.Severity severidad) {
+        FacesContext.getCurrentInstance().addMessage(null,
+                new FacesMessage(severidad, titulo, mensaje));
+    }
+
+    // Getters y setters
+    public List<Usuario> getUsuarios() {
         return usuarios;
+    }
+
+    public void setUsuarios(List<Usuario> usuarios) {
+        this.usuarios = usuarios;
     }
 
     public Usuario getUsuarioSeleccionado() {
@@ -63,31 +175,19 @@ public class UsuarioBean implements Serializable {
         this.usuarioSeleccionado = usuarioSeleccionado;
     }
 
-    // Clase interna Usuario
-    public static class Usuario {
-        private int id;
-        private String nombre;
-        private String email;
-        private String rol;
-        private boolean activo; // Nuevo campo para el estado
+    public Usuario getNuevoUsuario() {
+        return nuevoUsuario;
+    }
 
-        public Usuario(int id, String nombre, String email, String rol, boolean activo) {
-            this.id = id;
-            this.nombre = nombre;
-            this.email = email;
-            this.rol = rol;
-            this.activo = activo;
-        }
+    public void setNuevoUsuario(Usuario nuevoUsuario) {
+        this.nuevoUsuario = nuevoUsuario;
+    }
 
-        // Getters y Setters
-        public int getId() { return id; }
-        public String getNombre() { return nombre; }
-        public void setNombre(String nombre) { this.nombre = nombre; }
-        public String getEmail() { return email; }
-        public void setEmail(String email) { this.email = email; }
-        public String getRol() { return rol; }
-        public void setRol(String rol) { this.rol = rol; }
-        public boolean isActivo() { return activo; }
-        public void setActivo(boolean activo) { this.activo = activo; }
+    public String getBusqueda() {      // ← ¡ESTE FALTABA!
+        return busqueda;
+    }
+
+    public void setBusqueda(String busqueda) {
+        this.busqueda = busqueda;
     }
 }

@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<persistence version="3.0" 
+             xmlns="https://jakarta.ee/xml/ns/persistence"
+             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+             xsi:schemaLocation="https://jakarta.ee/xml/ns/persistence 
+             https://jakarta.ee/xml/ns/persistence/persistence_3_0.xsd">
+    
+    <persistence-unit name="SkatelifePU" transaction-type="JTA">
+        <jta-data-source>jdbc/skatelife</jta-data-source>
+        
+        <!-- Escaneo automático de entidades -->
+        <exclude-unlisted-classes>false</exclude-unlisted-classes>
+        
+        <properties>
+            <!-- Dialecto de MySQL 8 -->
+            <property name="hibernate.dialect" value="org.hibernate.dialect.MySQLDialect"/>
+            
+            <!-- Mostrar SQL en consola (desarrollo) -->
+            <property name="hibernate.show_sql" value="true"/>
+            <property name="hibernate.format_sql" value="true"/>
+            
+            <!-- NO crear/modificar tablas automáticamente -->
+            <!-- Ya tienes tu BD creada, así que usamos 'none' o 'validate' -->
+            <property name="hibernate.hbm2ddl.auto" value="none"/>
+            
+            <!-- Codificación UTF-8 -->
+            <property name="hibernate.connection.characterEncoding" value="utf8mb4"/>
+            <property name="hibernate.connection.useUnicode" value="true"/>
+        </properties>
+    </persistence-unit>
+</persistence>
