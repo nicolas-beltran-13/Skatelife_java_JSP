@@ -1,106 +1,143 @@
-package com.mycompany.beans;
+package com.skatelife.bean;
 
+import com.skatelife.dao.CategoriaDAO;
+import com.skatelife.dao.ProductoDAO;
+import com.skatelife.model.Categoria;
+import com.skatelife.model.Producto;
 import jakarta.annotation.PostConstruct;
-import jakarta.enterprise.context.SessionScoped;
+import jakarta.ejb.EJB;
 import jakarta.faces.application.FacesMessage;
 import jakarta.faces.context.FacesContext;
 import jakarta.inject.Named;
+import jakarta.enterprise.context.SessionScoped;
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.List;
 
-@Named
+@Named("productoBean")
 @SessionScoped
 public class ProductoBean implements Serializable {
-
-    private String nombre;
-    private String categoria;
-    private Double precio;
-    private Integer stock;
-
-    private List<Producto> productos = new ArrayList<>();
-
+    
+    private static final long serialVersionUID = 1L;
+    
+    @EJB
+    private ProductoDAO productoDAO;
+    
+    @EJB
+    private CategoriaDAO categoriaDAO;
+    
+    private List<Producto> productos;
+    private List<Categoria> categorias;
+    private Producto nuevoProducto;
+    private Producto productoSeleccionado;
+    
     @PostConstruct
     public void init() {
-        if (productos.isEmpty()) {
-            productos.add(new Producto(1, "Tabla Cruiser", "tablas", 180000.0, 10));
-            productos.add(new Producto(2, "Ruedas 56mm", "ruedas", 45000.0, 25));
+        System.out.println("=== ProductoBean.init() ejecutándose ===");
+        cargarProductos();
+        cargarCategorias();
+        nuevoProducto = new Producto();
+    }
+    
+    public void cargarProductos() {
+        try {
+            System.out.println("Cargando productos...");
+            productos = productoDAO.findAll();
+            System.out.println("Productos cargados: " + (productos != null ? productos.size() : "null"));
+        } catch (Exception e) {
+            System.err.println("ERROR al cargar productos: " + e.getMessage());
+            e.printStackTrace();
+            mostrarMensaje("Error", "No se pudieron cargar los productos: " + e.getMessage(), 
+                          FacesMessage.SEVERITY_ERROR);
         }
     }
-
-    public String guardar() {
-        if (nombre != null && !nombre.trim().isEmpty() &&
-            categoria != null && precio != null && stock != null) {
-
-            int nuevoId = productos.stream().mapToInt(p -> p.id).max().orElse(0) + 1;
-            productos.add(new Producto(nuevoId, nombre, categoria, precio, stock));
-
-            // Resetear formulario
-            this.nombre = "";
-            this.categoria = "";
-            this.precio = null;
-            this.stock = null;
-
-            FacesContext.getCurrentInstance().addMessage(null,
-                new FacesMessage(FacesMessage.SEVERITY_INFO,
-                    "✅ Producto agregado", "El producto se registró correctamente."));
-        } else {
-            FacesContext.getCurrentInstance().addMessage(null,
-                new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                    "❌ Error", "Todos los campos son obligatorios."));
+    
+    public void cargarCategorias() {
+        try {
+            System.out.println("Cargando categorías...");
+            categorias = categoriaDAO.findAll();
+            System.out.println("Categorías cargadas: " + (categorias != null ? categorias.size() : "null"));
+        } catch (Exception e) {
+            System.err.println("ERROR al cargar categorías: " + e.getMessage());
+            e.printStackTrace();
+            mostrarMensaje("Error", "No se pudieron cargar las categorías: " + e.getMessage(), 
+                          FacesMessage.SEVERITY_ERROR);
         }
-        return null;
     }
-
-    public List<Producto> getTodosLosProductos() {
+    
+    public void guardarNuevo() {
+        try {
+            System.out.println("Guardando nuevo producto: " + nuevoProducto.getNombreproducto());
+            productoDAO.save(nuevoProducto);
+            cargarProductos();
+            nuevoProducto = new Producto();
+            mostrarMensaje("Éxito", "Producto creado correctamente", FacesMessage.SEVERITY_INFO);
+        } catch (Exception e) {
+            System.err.println("ERROR al guardar producto: " + e.getMessage());
+            e.printStackTrace();
+            mostrarMensaje("Error", "No se pudo crear el producto: " + e.getMessage(), 
+                          FacesMessage.SEVERITY_ERROR);
+        }
+    }
+    
+    public void prepararEditar(Producto producto) {
+        this.productoSeleccionado = producto;
+    }
+    
+    public void actualizar() {
+        try {
+            productoDAO.update(productoSeleccionado);
+            cargarProductos();
+            mostrarMensaje("Éxito", "Producto actualizado correctamente", FacesMessage.SEVERITY_INFO);
+        } catch (Exception e) {
+            mostrarMensaje("Error", "No se pudo actualizar el producto", FacesMessage.SEVERITY_ERROR);
+        }
+    }
+    
+    public void eliminar(Integer id) {
+        try {
+            productoDAO.delete(id);
+            cargarProductos();
+            mostrarMensaje("Éxito", "Producto eliminado correctamente", FacesMessage.SEVERITY_INFO);
+        } catch (Exception e) {
+            mostrarMensaje("Error", "No se pudo eliminar el producto", FacesMessage.SEVERITY_ERROR);
+        }
+    }
+    
+    public void mostrarMensaje(String titulo, String mensaje, FacesMessage.Severity severidad) {
+        FacesContext.getCurrentInstance().addMessage(null, 
+            new FacesMessage(severidad, titulo, mensaje));
+    }
+    
+    // Getters y Setters
+    public List<Producto> getProductos() {
         return productos;
     }
-
-    // Getters y Setters
-    public String getNombre() { return nombre; }
-    public void setNombre(String nombre) { this.nombre = nombre; }
-    public String getCategoria() { return categoria; }
-    public void setCategoria(String categoria) { this.categoria = categoria; }
-    public Double getPrecio() { return precio; }
-    public void setPrecio(Double precio) { this.precio = precio; }
-    public Integer getStock() { return stock; }
-    public void setStock(Integer stock) { this.stock = stock; }
-
-    // Clase interna Producto
-    public static class Producto {
-        private int id;          // ✅ Cambiado a private
-        private String nombre;   // ✅ Cambiado a private
-        private String categoria; // ✅ Cambiado a private
-        private Double precio;    // ✅ Cambiado a private
-        private Integer stock;    // ✅ Cambiado a private
-
-        public Producto(int id, String nombre, String categoria, Double precio, Integer stock) {
-            this.id = id;
-            this.nombre = nombre;
-            this.categoria = categoria;
-            this.precio = precio;
-            this.stock = stock;
-        }
-
-        // ✅ Todos los getters son obligatorios para JSF
-        public int getId() {
-            return id;
-        }
-
-        public String getNombre() {
-            return nombre;
-        }
-
-        public String getCategoria() {
-            return categoria;
-        }
-
-        public Double getPrecio() {
-            return precio;
-        }
-
-        public Integer getStock() {
-            return stock;
-        }
+    
+    public void setProductos(List<Producto> productos) {
+        this.productos = productos;
+    }
+    
+    public List<Categoria> getCategorias() {
+        return categorias;
+    }
+    
+    public void setCategorias(List<Categoria> categorias) {
+        this.categorias = categorias;
+    }
+    
+    public Producto getNuevoProducto() {
+        return nuevoProducto;
+    }
+    
+    public void setNuevoProducto(Producto nuevoProducto) {
+        this.nuevoProducto = nuevoProducto;
+    }
+    
+    public Producto getProductoSeleccionado() {
+        return productoSeleccionado;
+    }
+    
+    public void setProductoSeleccionado(Producto productoSeleccionado) {
+        this.productoSeleccionado = productoSeleccionado;
     }
 }

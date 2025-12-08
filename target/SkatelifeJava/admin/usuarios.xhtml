@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml"
-      xmlns:h="http://java.sun.com/jsf/html"
-      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
       xmlns:p="http://primefaces.org/ui">
 
     <h:head>
@@ -41,11 +41,6 @@
                     <!-- Encabezado -->
                     <div class="page-header">
                         <h1>Gestión de Usuarios</h1>
-                        <p:commandButton value="Nuevo Usuario"
-                                         icon="pi pi-plus"
-                                         styleClass="btn-primary"
-                                         onclick="PF('dialogNuevoUsuario').show()"
-                                         type="button"/>
                     </div>
 
                     <!-- Estadísticas rápidas -->
@@ -53,8 +48,8 @@
                         <div class="stat-card">
                             <i class="pi pi-users"></i>
                             <div class="stat-info">
-                                <h3>#{usuarioBean.usuarios.size()}</h3>
-                                <p>Total Administradores</p>
+                                <h3>#{usuarioBean.usuarios != null ? usuarioBean.usuarios.size() : 0}</h3>
+                                <p>Total Usuarios</p>
                             </div>
                         </div>
                     </div>
@@ -69,7 +64,7 @@
                                              style="width: 100%">
                                     <p:ajax event="keyup"
                                             update="tablaUsuarios"
-                                            listener="#{usuarioBean.aplicarFiltros}"/>
+                                            listener="#{usuarioBean.cargarUsuarios}"/>
                                 </p:inputText>
                             </div>
 
@@ -77,7 +72,7 @@
                                 <p:commandButton value="Limpiar"
                                                  icon="pi pi-filter-slash"
                                                  update="tablaUsuarios busqueda"
-                                                 action="#{usuarioBean.limpiarFiltros}"
+                                                 action="#{usuarioBean.limpiarBusqueda}"
                                                  styleClass="ui-button-secondary"/>
                             </div>
                         </div>
@@ -92,20 +87,20 @@
                                  rowsPerPageTemplate="10,20,50"
                                  emptyMessage="No se encontraron usuarios">
 
-                        <p:column headerText="ID" sortBy="#{usuario.id}" style="width: 60px">
-                            <h:outputText value="#{usuario.id}"/>
+                        <p:column headerText="ID" sortBy="#{usuario.pkIdusuario}" style="width: 60px">
+                            <h:outputText value="#{usuario.pkIdusuario}"/>
                         </p:column>
 
-                        <p:column headerText="Username" sortBy="#{usuario.username}">
-                            <h:outputText value="#{usuario.username}"/>
+                        <p:column headerText="Username" sortBy="#{usuario.numide}">
+                            <h:outputText value="#{usuario.numide}"/>
                         </p:column>
 
                         <p:column headerText="Nombre" sortBy="#{usuario.nombre}">
                             <h:outputText value="#{usuario.nombre}"/>
                         </p:column>
 
-                        <p:column headerText="Apellido" sortBy="#{usuario.apellido}">
-                            <h:outputText value="#{usuario.apellido}"/>
+                        <p:column headerText="Apellido" sortBy="#{usuario.apellidos}">
+                            <h:outputText value="#{usuario.apellidos}"/>
                         </p:column>
 
                         <p:column headerText="Correo" sortBy="#{usuario.correo}">
@@ -113,11 +108,11 @@
                         </p:column>
 
                         <p:column headerText="Celular">
-                            <h:outputText value="#{usuario.celular}"/>
+                            <h:outputText value="#{usuario.telefono}"/>
                         </p:column>
 
                         <p:column headerText="Rol" style="width: 120px">
-                            <span class="badge badge-ADMIN">ADMIN</span>
+                            <span class="badge badge-#{usuario.rol}">#{usuario.rol}</span>
                         </p:column>
 
                         <p:column headerText="Estado" style="width: 100px">
@@ -125,27 +120,120 @@
                         </p:column>
 
                         <p:column headerText="Acciones" style="width: 140px; text-align: center">
-                            <p:commandButton icon="pi pi-pencil"
-                                             title="Editar"
-                                             styleClass="ui-button-warning"
-                                             action="#{usuarioBean.prepararEdicion(usuario)}"
-                                             update=":formEditar"
-                                             onclick="PF('dialogEditarUsuario').show()"/>
+    <p:commandButton icon="pi pi-pencil"
+                     title="Editar"
+                     styleClass="ui-button-warning"
+                     disabled="true"/>
 
-                            <p:commandButton icon="pi pi-trash"
-                                             title="Eliminar"
-                                             styleClass="ui-button-danger"
-                                             action="#{usuarioBean.eliminarUsuario(usuario)}"
-                                             update="tablaUsuarios messages">
-                                <p:confirm header="Confirmación"
-                                           message="¿Está seguro de eliminar este usuario?"
-                                           icon="pi pi-exclamation-triangle"/>
-                            </p:commandButton>
-                        </p:column>
+    <p:commandButton icon="pi pi-trash"
+                     title="Eliminar"
+                     styleClass="ui-button-danger"
+                     disabled="true"/>
+</p:column>
                     </p:dataTable>
 
-                    <!-- DIÁLOGOS (no modificados porque estaban bien) -->
-                    <!-- ... -->
+                    <!-- Diálogo de confirmación -->
+                    <p:confirmDialog global="true" showEffect="fade" hideEffect="fade">
+                        <p:commandButton value="Sí" type="button" 
+                                       styleClass="ui-confirmdialog-yes ui-button-success"/>
+                        <p:commandButton value="No" type="button" 
+                                       styleClass="ui-confirmdialog-no ui-button-danger"/>
+                    </p:confirmDialog>
+
+                    <!-- DIÁLOGO NUEVO USUARIO -->
+                    <p:dialog header="Nuevo Usuario" 
+                              widgetVar="dialogNuevoUsuario" 
+                              modal="true" 
+                              width="600"
+                              showEffect="fade">
+                        <h:form id="formNuevo">
+                            <p:panelGrid columns="2" styleClass="ui-noborder">
+                                <p:outputLabel value="Número ID:"/>
+                                <p:inputText value="#{usuarioBean.nuevoUsuario.numide}" required="true"/>
+
+                                <p:outputLabel value="Nombre:"/>
+                                <p:inputText value="#{usuarioBean.nuevoUsuario.nombre}" required="true"/>
+
+                                <p:outputLabel value="Apellidos:"/>
+                                <p:inputText value="#{usuarioBean.nuevoUsuario.apellidos}" required="true"/>
+
+                                <p:outputLabel value="Correo:"/>
+                                <p:inputText value="#{usuarioBean.nuevoUsuario.correo}" required="true"/>
+
+                                <p:outputLabel value="Teléfono:"/>
+                                <p:inputText value="#{usuarioBean.nuevoUsuario.telefono}"/>
+
+                                <p:outputLabel value="Contraseña:"/>
+                                <p:password value="#{usuarioBean.nuevoUsuario.contrasena}" required="true"/>
+
+                                <p:outputLabel value="Rol:"/>
+                                <p:selectOneMenu value="#{usuarioBean.nuevoUsuario.rol}">
+                                    <f:selectItem itemLabel="Usuario" itemValue="usuario"/>
+                                    <f:selectItem itemLabel="Administrador" itemValue="admin"/>
+                                </p:selectOneMenu>
+                            </p:panelGrid>
+
+                            <div style="text-align: right; margin-top: 20px;">
+                                <p:commandButton value="Cancelar" 
+                                               onclick="PF('dialogNuevoUsuario').hide()" 
+                                               type="button"
+                                               styleClass="ui-button-secondary"/>
+                                <p:commandButton value="Guardar" 
+                                               action="#{usuarioBean.guardarNuevo}"
+                                               update=":formUsuarios:tablaUsuarios :formUsuarios:messages"
+                                               oncomplete="if (args.validationFailed == false) PF('dialogNuevoUsuario').hide()"
+                                               styleClass="ui-button-success"/>
+                            </div>
+                        </h:form>
+                    </p:dialog>
+
+                    <!-- DIÁLOGO EDITAR USUARIO -->
+                    <p:dialog header="Editar Usuario" 
+                              widgetVar="dialogEditarUsuario" 
+                              modal="true" 
+                              width="600"
+                              showEffect="fade">
+                        <h:form id="formEditar">
+                            <p:panelGrid columns="2" styleClass="ui-noborder">
+                                <p:outputLabel value="ID:"/>
+                                <p:inputText value="#{usuarioBean.usuarioSeleccionado.pkIdusuario}" disabled="true"/>
+
+                                <p:outputLabel value="Número ID:"/>
+                                <p:inputText value="#{usuarioBean.usuarioSeleccionado.numide}" required="true"/>
+
+                                <p:outputLabel value="Nombre:"/>
+                                <p:inputText value="#{usuarioBean.usuarioSeleccionado.nombre}" required="true"/>
+
+                                <p:outputLabel value="Apellidos:"/>
+                                <p:inputText value="#{usuarioBean.usuarioSeleccionado.apellidos}" required="true"/>
+
+                                <p:outputLabel value="Correo:"/>
+                                <p:inputText value="#{usuarioBean.usuarioSeleccionado.correo}" required="true"/>
+
+                                <p:outputLabel value="Teléfono:"/>
+                                <p:inputText value="#{usuarioBean.usuarioSeleccionado.telefono}"/>
+
+                                <p:outputLabel value="Rol:"/>
+                                <p:selectOneMenu value="#{usuarioBean.usuarioSeleccionado.rol}">
+                                    <f:selectItem itemLabel="Usuario" itemValue="usuario"/>
+                                    <f:selectItem itemLabel="Administrador" itemValue="admin"/>
+                                </p:selectOneMenu>
+                            </p:panelGrid>
+
+                            <div style="text-align: right; margin-top: 20px;">
+                                <p:commandButton value="Cancelar" 
+                                               onclick="PF('dialogEditarUsuario').hide()" 
+                                               type="button"
+                                               styleClass="ui-button-secondary"/>
+                                <p:commandButton value="Actualizar" 
+                                               action="#{usuarioBean.actualizar}"
+                                               update=":formUsuarios:tablaUsuarios :formUsuarios:messages"
+                                               oncomplete="if (args.validationFailed == false) PF('dialogEditarUsuario').hide()"
+                                               styleClass="ui-button-success"/>
+                            </div>
+                        </h:form>
+                    </p:dialog>
+
                 </h:form>
             </div>
         </div>

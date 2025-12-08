@@ -5,92 +5,208 @@
       xmlns:f="http://xmlns.jcp.org/jsf/core"
       xmlns:p="http://primefaces.org/ui">
 
-<h:head>
-    <title>Gestión de Productos - Skatelife Admin</title>
-    <meta charset="UTF-8"/>
-    <h:outputStylesheet library="css" name="admin.css"/>
-</h:head>
+    <h:head>
+        <title>Gestión de Productos - Skatelife Admin</title>
+        <h:outputStylesheet library="css" name="admin.css"/>
+    </h:head>
 
-<h:body>
-    <!-- Sidebar -->
-    <div class="sidebar">
-        <div class="logo">Skatelife Admin</div>
-        <a href="panel_admin.xhtml" class="nav-link">Panel Principal</a>
-        <a href="productos.xhtml" class="nav-link active">Gestión de Productos</a>
-        <a href="reportes.xhtml" class="nav-link">Reportes</a>
-        <a href="usuarios.xhtml" class="nav-link">Usuarios</a>
-    </div>
-
-    <!-- Contenido principal -->
-    <div class="main-content">
-        <h1>Gestión de Productos</h1>
-
-        <h:form id="mainForm">
-            <!-- Mensajes de éxito/errores -->
-            <p:growl id="messages" showDetail="true"/>
-
-            <!-- Sección 1: Formulario para agregar -->
-            <div class="section">
-                <h2 class="section-title">Agregar Nuevo Producto</h2>
-                <div class="form-grid">
-                    <div class="form-group">
-                        <label>Nombre</label>
-                        <h:inputText value="#{productoBean.nombre}" required="true" styleClass="form-control"/>
-                    </div>
-                    <div class="form-group">
-                        <label>Categoría</label>
-                        <h:selectOneMenu value="#{productoBean.categoria}" required="true" styleClass="form-control">
-                            <f:selectItem itemLabel="Selecciona..." noSelectionOption="true"/>
-                            <f:selectItem itemLabel="Tablas" itemValue="tablas"/>
-                            <f:selectItem itemLabel="Ruedas" itemValue="ruedas"/>
-                            <f:selectItem itemLabel="Ropa" itemValue="ropa"/>
-                            <f:selectItem itemLabel="Accesorios" itemValue="accesorios"/>
-                        </h:selectOneMenu>
-                    </div>
-                    <div class="form-group">
-                        <label>Precio (COP)</label>
-                        <h:inputText value="#{productoBean.precio}" required="true" type="number" styleClass="form-control"/>
-                    </div>
-                    <div class="form-group">
-                        <label>Stock</label>
-                        <h:inputText value="#{productoBean.stock}" required="true" type="number" styleClass="form-control"/>
-                    </div>
-                </div>
-                <p:commandButton value="Agregar Producto" action="#{productoBean.guardar}" styleClass="btn"/>
+    <h:body>
+        <div class="admin-container">
+            <!-- Sidebar -->
+            <div class="sidebar">
+                <h2>Skatelife Admin</h2>
+                <ul class="menu">
+                    <li>
+                        <h:link value="Panel" outcome="/admin/panel_admin"/>
+                    </li>
+                    <li class="active">
+                        <h:link value="Productos" outcome="/admin/productos"/>
+                    </li>
+                    <li>
+                        <h:link value="Reportes" outcome="/admin/reportes"/>
+                    </li>
+                    <li>
+                        <h:link value="Usuarios" outcome="/admin/usuarios"/>
+                    </li>
+                </ul>
             </div>
 
-            <!-- Sección 2: Lista de Productos -->
-            <div class="section">
-                <h2 class="section-title">Productos Registrados</h2>
-                <p:dataTable id="tablaProductos" value="#{productoBean.todosLosProductos}" var="prod" paginator="true" rows="10" styleClass="table">
-                    <p:column headerText="ID" sortBy="#{prod.id}">
-                        <h:outputText value="#{prod.id}"/>
-                    </p:column>
-                    <p:column headerText="Nombre" sortBy="#{prod.nombre}">
-                        <h:outputText value="#{prod.nombre}"/>
-                    </p:column>
-                    <p:column headerText="Categoría" sortBy="#{prod.categoria}">
-                        <h:outputText value="#{prod.categoria}"/>
-                    </p:column>
-                    <p:column headerText="Precio" sortBy="#{prod.precio}">
-                        <h:outputText value="#{prod.precio}"/>
-                    </p:column>
-                    <p:column headerText="Stock" sortBy="#{prod.stock}">
-                        <h:outputText value="#{prod.stock}"/>
-                    </p:column>
-                    <p:column headerText="Acciones">
-                        <p:commandButton icon="pi pi-pencil" title="Editar" styleClass="ui-button-warning" action="#{productoBean.editarProducto(prod)}"/>
-                        <p:commandButton icon="pi pi-trash" title="Eliminar" styleClass="ui-button-danger" action="#{productoBean.eliminarProducto(prod)}">
-                            <p:confirm header="Confirmación" message="¿Estás seguro de eliminar este producto?" icon="pi pi-exclamation-triangle"/>
-                        </p:commandButton>
-                    </p:column>
-                </p:dataTable>
+            <!-- Contenido principal -->
+            <div class="main-content">
+                <h:form id="formProductos">
+                    <p:growl id="messages" showDetail="true"/>
 
-                <h:panelGroup rendered="#{empty productoBean.todosLosProductos}">
-                    <div class="empty-message">No hay productos registrados aún.</div>
-                </h:panelGroup>
+                    <h1>Gestión de Productos</h1>
+
+                    <!-- Formulario Agregar Nuevo Producto -->
+                    <p:panel header="Agregar Nuevo Producto" style="margin-bottom: 20px;">
+                        <h:panelGrid columns="4" cellpadding="10" style="width: 100%;">
+                            
+                            <p:outputLabel value="Nombre" for="nombre"/>
+                            <p:outputLabel value="Categoría" for="categoria"/>
+                            <p:outputLabel value="Precio (COP)" for="precio"/>
+                            <p:outputLabel value="Stock" for="stock"/>
+                            
+                            <p:inputText id="nombre" 
+                                       value="#{productoBean.nuevoProducto.nombreproducto}"
+                                       required="true"
+                                       requiredMessage="El nombre es obligatorio"
+                                       style="width: 100%;"/>
+                            
+                            <p:selectOneMenu id="categoria" 
+                                           value="#{productoBean.nuevoProducto.categoria}"
+                                           required="true"
+                                           requiredMessage="La categoría es obligatoria"
+                                           converter="omnifaces.SelectItemsConverter"
+                                           style="width: 100%;">
+                                <f:selectItem itemLabel="Selecciona..." itemValue="#{null}" noSelectionOption="true"/>
+                                <f:selectItems value="#{productoBean.categorias}" 
+                                             var="cat" 
+                                             itemLabel="#{cat.nombrecategoria}" 
+                                             itemValue="#{cat}"/>
+                            </p:selectOneMenu>
+                            
+                            <p:inputNumber id="precio" 
+                                         value="#{productoBean.nuevoProducto.precio}"
+                                         decimalPlaces="0"
+                                         required="true"
+                                         requiredMessage="El precio es obligatorio"
+                                         minValue="0"
+                                         style="width: 100%;"/>
+                            
+                            <p:inputNumber id="stock" 
+                                         value="#{productoBean.nuevoProducto.cantidad}"
+                                         decimalPlaces="0"
+                                         required="true"
+                                         requiredMessage="El stock es obligatorio"
+                                         minValue="0"
+                                         style="width: 100%;"/>
+                        </h:panelGrid>
+                        
+                        <div style="margin-top: 15px;">
+                            <p:commandButton value="Agregar Producto" 
+                                           icon="pi pi-plus"
+                                           action="#{productoBean.guardarNuevo}"
+                                           update="formProductos:tablaProductos formProductos:messages"
+                                           styleClass="ui-button-success"
+                                           style="margin-right: 10px;"/>
+                                           
+                            <p:commandButton value="Limpiar" 
+                                           icon="pi pi-times"
+                                           type="reset"
+                                           styleClass="ui-button-secondary"/>
+                        </div>
+                    </p:panel>
+
+                    <!-- Tabla de Productos -->
+                    <p:panel header="Productos Registrados">
+                        <p:dataTable id="tablaProductos"
+                                     value="#{productoBean.productos}"
+                                     var="producto"
+                                     paginator="true"
+                                     rows="10"
+                                     rowsPerPageTemplate="10,20,50"
+                                     emptyMessage="No hay productos registrados">
+
+                            <p:column headerText="ID" style="width: 60px;">
+                                <h:outputText value="#{producto.pkIdproducto}"/>
+                            </p:column>
+
+                            <p:column headerText="Nombre" sortBy="#{producto.nombreproducto}">
+                                <h:outputText value="#{producto.nombreproducto}"/>
+                            </p:column>
+
+                            <p:column headerText="Categoría" sortBy="#{producto.categoria.nombrecategoria}">
+                                <h:outputText value="#{producto.categoria.nombrecategoria}"/>
+                            </p:column>
+
+                            <p:column headerText="Precio" style="width: 120px;">
+                                <h:outputText value="#{producto.precio}">
+                                    <f:convertNumber type="currency" currencySymbol="$" groupingUsed="true"/>
+                                </h:outputText>
+                            </p:column>
+
+                            <p:column headerText="Stock" style="width: 80px;">
+                                <h:outputText value="#{producto.cantidad}"/>
+                            </p:column>
+
+                            <p:column headerText="Acciones" style="width: 140px; text-align: center;">
+                                <p:commandButton icon="pi pi-pencil"
+                                               title="Editar"
+                                               styleClass="ui-button-warning"
+                                               action="#{productoBean.prepararEditar(producto)}"
+                                               update=":formEditar"
+                                               oncomplete="PF('dialogEditarProducto').show()"/>
+
+                                <p:commandButton icon="pi pi-trash"
+                                               title="Eliminar"
+                                               styleClass="ui-button-danger"
+                                               action="#{productoBean.eliminar(producto.pkIdproducto)}"
+                                               update="tablaProductos messages"
+                                               style="margin-left: 5px;">
+                                    <p:confirm header="Confirmación"
+                                             message="¿Está seguro de eliminar este producto?"
+                                             icon="pi pi-exclamation-triangle"/>
+                                </p:commandButton>
+                            </p:column>
+                        </p:dataTable>
+                    </p:panel>
+
+                    <!-- Diálogo de confirmación -->
+                    <p:confirmDialog global="true" showEffect="fade" hideEffect="fade">
+                        <p:commandButton value="Sí" type="button" 
+                                       styleClass="ui-confirmdialog-yes ui-button-success"/>
+                        <p:commandButton value="No" type="button" 
+                                       styleClass="ui-confirmdialog-no ui-button-danger"/>
+                    </p:confirmDialog>
+
+                </h:form>
+
+                <!-- DIÁLOGO EDITAR PRODUCTO -->
+                <p:dialog header="Editar Producto" 
+                          widgetVar="dialogEditarProducto" 
+                          modal="true" 
+                          width="600"
+                          showEffect="fade">
+                    <h:form id="formEditar">
+                        <p:panelGrid columns="2" styleClass="ui-noborder">
+                            <p:outputLabel value="ID:"/>
+                            <p:inputText value="#{productoBean.productoSeleccionado.pkIdproducto}" disabled="true"/>
+
+                            <p:outputLabel value="Nombre:"/>
+                            <p:inputText value="#{productoBean.productoSeleccionado.nombreproducto}" required="true"/>
+
+                            <p:outputLabel value="Categoría:"/>
+                            <p:selectOneMenu value="#{productoBean.productoSeleccionado.categoria}"
+                                           converter="omnifaces.SelectItemsConverter">
+                                <f:selectItems value="#{productoBean.categorias}" 
+                                             var="cat" 
+                                             itemLabel="#{cat.nombrecategoria}" 
+                                             itemValue="#{cat}"/>
+                            </p:selectOneMenu>
+
+                            <p:outputLabel value="Precio:"/>
+                            <p:inputNumber value="#{productoBean.productoSeleccionado.precio}" decimalPlaces="0"/>
+
+                            <p:outputLabel value="Stock:"/>
+                            <p:inputNumber value="#{productoBean.productoSeleccionado.cantidad}" decimalPlaces="0"/>
+                        </p:panelGrid>
+
+                        <div style="text-align: right; margin-top: 20px;">
+                            <p:commandButton value="Cancelar" 
+                                           onclick="PF('dialogEditarProducto').hide()" 
+                                           type="button"
+                                           styleClass="ui-button-secondary"/>
+                            <p:commandButton value="Actualizar" 
+                                           action="#{productoBean.actualizar}"
+                                           update=":formProductos:tablaProductos :formProductos:messages"
+                                           oncomplete="if (args.validationFailed == false) PF('dialogEditarProducto').hide()"
+                                           styleClass="ui-button-success"/>
+                        </div>
+                    </h:form>
+                </p:dialog>
+
             </div>
-        </h:form>
-    </div>
-</h:body>
+        </div>
+    </h:body>
 </html>

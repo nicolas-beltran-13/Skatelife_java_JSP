@@ -1,8 +1,12 @@
 C:\xampp\htdocs\SkatelifeJ\SkatelifeJava\src\main\java\com\mycompany\skatelifejava\ConexionBD.java
-C:\xampp\htdocs\SkatelifeJ\SkatelifeJava\src\main\java\Dao\UsuarioDAO.java
-C:\xampp\htdocs\SkatelifeJ\SkatelifeJava\src\main\java\Dao\ProductoDao.java
+C:\xampp\htdocs\SkatelifeJ\SkatelifeJava\src\main\java\dao\UsuarioDAO.java
+C:\xampp\htdocs\SkatelifeJ\SkatelifeJava\src\main\java\dao\CategoriaDAO.java
+C:\xampp\htdocs\SkatelifeJ\SkatelifeJava\src\main\java\dao\ProductoDAO.java
 C:\xampp\htdocs\SkatelifeJ\SkatelifeJava\src\main\java\bean\UsuarioBean.java
 C:\xampp\htdocs\SkatelifeJ\SkatelifeJava\src\main\java\bean\ProductoBean.java
 C:\xampp\htdocs\SkatelifeJ\SkatelifeJava\src\main\java\model\Usuario.java
-C:\xampp\htdocs\SkatelifeJ\SkatelifeJava\src\main\java\Dao\ReporteDao.java
+C:\xampp\htdocs\SkatelifeJ\SkatelifeJava\src\main\java\util\DatabaseUtil.java
+C:\xampp\htdocs\SkatelifeJ\SkatelifeJava\src\main\java\dao\ReporteDao.java
+C:\xampp\htdocs\SkatelifeJ\SkatelifeJava\src\main\java\model\Categoria.java
+C:\xampp\htdocs\SkatelifeJ\SkatelifeJava\src\main\java\model\Producto.java
 C:\xampp\htdocs\SkatelifeJ\SkatelifeJava\src\main\java\bean\ReporteBean.java

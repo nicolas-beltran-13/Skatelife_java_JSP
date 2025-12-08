@@ -1,69 +1,66 @@
-package com.skatelife.model;
+package model;
 
 import jakarta.persistence.*;
 import java.io.Serializable;
+import java.util.Date;
 
 @Entity
-@Table(name = "tbl_administrador")
+@Table(name = "usuario")
 public class Usuario implements Serializable {
     
+    private static final long serialVersionUID = 1L;
+    
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "pk_idadministrador")
-    private Integer id;
+    @Column(name = "pk_idusuario")
+    private Integer pkIdusuario;
     
-    @Column(name = "pk_nombreusuario", nullable = false, unique = true, length = 50)
-    private String username;
+    @Column(name = "numide")
+    private String numide;
     
-    @Column(name = "password", nullable = false)
-    private String password;
-    
-    @Column(name = "nombre", length = 100)
+    @Column(name = "nombre")
     private String nombre;
     
-    @Column(name = "apellido", length = 100)
-    private String apellido;
+    @Column(name = "apellidos")
+    private String apellidos;
     
-    @Column(name = "correo", length = 100)
+    @Column(name = "fechaNacimiento")
+    @Temporal(TemporalType.DATE)
+    private Date fechaNacimiento;
+    
+    @Column(name = "direccion")
+    private String direccion;
+    
+    @Column(name = "telefono")
+    private String telefono;
+    
+    @Column(name = "correo")
     private String correo;
     
-    @Column(name = "celular", length = 15)
-    private String celular;
+    @Column(name = "contraseña")
+    private String contrasena;
     
-    // Campo adicional para roles (puedes agregarlo a tu BD si quieres)
-    @Transient // No se mapea a BD por ahora
-    private String rol = "ADMIN";
+    @Column(name = "rol")
+    private String rol;
     
-    @Transient // No se mapea a BD por ahora
-    private Boolean activo = true;
-    
-    // Constructor vacío
+    // Constructor vacío (OBLIGATORIO para JPA)
     public Usuario() {
     }
     
-    // Getters y Setters
-    public Integer getId() {
-        return id;
+    // Getters y Setters para TODOS los campos
+    public Integer getPkIdusuario() {
+        return pkIdusuario;
     }
     
-    public void setId(Integer id) {
-        this.id = id;
+    public void setPkIdusuario(Integer pkIdusuario) {
+        this.pkIdusuario = pkIdusuario;
     }
     
-    public String getUsername() {
-        return username;
+    public String getNumide() {
+        return numide;
     }
     
-    public void setUsername(String username) {
-        this.username = username;
-    }
-    
-    public String getPassword() {
-        return password;
-    }
-    
-    public void setPassword(String password) {
-        this.password = password;
+    public void setNumide(String numide) {
+        this.numide = numide;
     }
     
     public String getNombre() {
@@ -74,12 +71,36 @@ public class Usuario implements Serializable {
         this.nombre = nombre;
     }
     
-    public String getApellido() {
-        return apellido;
+    public String getApellidos() {
+        return apellidos;
     }
     
-    public void setApellido(String apellido) {
-        this.apellido = apellido;
+    public void setApellidos(String apellidos) {
+        this.apellidos = apellidos;
+    }
+    
+    public Date getFechaNacimiento() {
+        return fechaNacimiento;
+    }
+    
+    public void setFechaNacimiento(Date fechaNacimiento) {
+        this.fechaNacimiento = fechaNacimiento;
+    }
+    
+    public String getDireccion() {
+        return direccion;
+    }
+    
+    public void setDireccion(String direccion) {
+        this.direccion = direccion;
+    }
+    
+    public String getTelefono() {
+        return telefono;
+    }
+    
+    public void setTelefono(String telefono) {
+        this.telefono = telefono;
     }
     
     public String getCorreo() {
@@ -90,12 +111,12 @@ public class Usuario implements Serializable {
         this.correo = correo;
     }
     
-    public String getCelular() {
-        return celular;
+    public String getContrasena() {
+        return contrasena;
     }
     
-    public void setCelular(String celular) {
-        this.celular = celular;
+    public void setContrasena(String contrasena) {
+        this.contrasena = contrasena;
     }
     
     public String getRol() {
@@ -104,25 +125,5 @@ public class Usuario implements Serializable {
     
     public void setRol(String rol) {
         this.rol = rol;
-    }
-    
-    public Boolean getActivo() {
-        return activo;
-    }
-    
-    public void setActivo(Boolean activo) {
-        this.activo = activo;
-    }
-    
-    // Método de conveniencia para obtener nombre completo
-    public String getNombreCompleto() {
-        if (nombre != null && apellido != null) {
-            return nombre + " " + apellido;
-        } else if (nombre != null) {
-            return nombre;
-        } else if (apellido != null) {
-            return apellido;
-        }
-        return username;
     }
 }
