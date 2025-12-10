@@ -1,0 +1,246 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui">
+
+    <h:head>
+        <title>Gestión de Usuarios - Skatelife Admin</title>
+        <h:outputStylesheet library="css" name="admin.css"/>
+    </h:head>
+
+    <h:body>
+        <div class="admin-container">
+
+            <!-- Sidebar -->
+            <div class="sidebar">
+                <h2>Skatelife Admin</h2>
+
+                <ul class="menu">
+                    <li>
+                        <h:link value="Panel" outcome="/admin/panel_admin"/>
+                    </li>
+                    <li>
+                        <h:link value="Productos" outcome="/admin/productos"/>
+                    </li>
+                    <li class="active">
+                        <h:link value="Usuarios" outcome="/admin/usuarios"/>
+                    </li>
+                     <li style="margin-top: 1rem; border-top: 1px solid rgba(255,255,255,0.2); padding-top: 1rem;">
+                    <h:form>
+                        <h:commandLink value="Cerrar sesión"
+                                       action="#{sessionBean.logout}"
+                                       styleClass="logout-btn"
+                                       onclick="return confirm('¿Deseas cerrar sesión?');"/>
+                    </h:form>
+                </li>
+                </ul>
+            </div>
+
+            <!-- Contenido principal -->
+            <div class="main-content">
+                <h:form id="formUsuarios">
+                    <p:growl id="messages" showDetail="true"/>
+
+                    <!-- Encabezado -->
+                    <div class="page-header">
+                        <h1>Gestión de Usuarios</h1>
+                    </div>
+
+                    <!-- Estadísticas -->
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <i class="pi pi-users"></i>
+                            <div class="stat-info">
+                                <h3>#{usuarioBean.usuarios != null ? usuarioBean.usuarios.size() : 0}</h3>
+                                <p>Total Usuarios</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Filtros -->
+                    <p:panel header="Búsqueda de Usuarios" styleClass="filter-panel">
+                        <div class="p-grid">
+                            <div class="p-col-12 p-md-6">
+                                <p:inputText id="busqueda"
+                                             value="#{usuarioBean.busqueda}"
+                                             placeholder="Buscar por nombre, correo o username"
+                                             style="width: 100%">
+                                    <p:ajax event="keyup"
+                                            update="tablaUsuarios"
+                                            listener="#{usuarioBean.cargarUsuarios}"/>
+                                </p:inputText>
+                            </div>
+
+                            <div class="p-col-12 p-md-2">
+                                <p:commandButton value="Limpiar"
+                                                 icon="pi pi-filter-slash"
+                                                 update="tablaUsuarios busqueda"
+                                                 action="#{usuarioBean.limpiarBusqueda}"
+                                                 styleClass="ui-button-secondary"/>
+                            </div>
+                        </div>
+                    </p:panel>
+
+                    <!-- Tabla -->
+                    <p:dataTable id="tablaUsuarios"
+                                 value="#{usuarioBean.usuarios}"
+                                 var="usuario"
+                                 paginator="true"
+                                 rows="10"
+                                 rowsPerPageTemplate="10,20,50"
+                                 emptyMessage="No se encontraron usuarios">
+
+                        <p:column headerText="ID" sortBy="#{usuario.idUsuario}" style="width: 60px">
+                            <h:outputText value="#{usuario.idUsuario}"/>
+                        </p:column>
+
+                        <p:column headerText="Username" sortBy="#{usuario.numide}">
+                            <h:outputText value="#{usuario.numide}"/>
+                        </p:column>
+
+                        <p:column headerText="Nombre" sortBy="#{usuario.nombre}">
+                            <h:outputText value="#{usuario.nombre}"/>
+                        </p:column>
+
+                        <p:column headerText="Apellido" sortBy="#{usuario.apellidos}">
+                            <h:outputText value="#{usuario.apellidos}"/>
+                        </p:column>
+
+                        <p:column headerText="Correo" sortBy="#{usuario.correo}">
+                            <h:outputText value="#{usuario.correo}"/>
+                        </p:column>
+
+                        <p:column headerText="Celular">
+                            <h:outputText value="#{usuario.telefono}"/>
+                        </p:column>
+
+                        <p:column headerText="Rol" style="width: 120px">
+                            <span class="badge badge-#{usuario.rol}">#{usuario.rol}</span>
+                        </p:column>
+
+                        <p:column headerText="Estado" style="width: 100px">
+                            <span class="badge badge-activo">Activo</span>
+                        </p:column>
+
+                        <p:column headerText="Acciones" style="width: 140px; text-align: center">
+                            <p:commandButton icon="pi pi-pencil"
+                                             title="Editar"
+                                             styleClass="ui-button-warning"
+                                             disabled="true"/>
+
+                            <p:commandButton icon="pi pi-trash"
+                                             title="Eliminar"
+                                             styleClass="ui-button-danger"
+                                             disabled="true"/>
+                        </p:column>
+                    </p:dataTable>
+
+                    <!-- Diálogo confirmación -->
+                    <p:confirmDialog global="true" showEffect="fade" hideEffect="fade">
+                        <p:commandButton value="Sí" type="button" 
+                                       styleClass="ui-confirmdialog-yes ui-button-success"/>
+                        <p:commandButton value="No" type="button" 
+                                       styleClass="ui-confirmdialog-no ui-button-danger"/>
+                    </p:confirmDialog>
+
+                    <!-- Diálogo nuevo usuario -->
+                    <p:dialog header="Nuevo Usuario" 
+                              widgetVar="dialogNuevoUsuario" 
+                              modal="true" 
+                              width="600"
+                              showEffect="fade">
+                        <h:form id="formNuevo">
+                            <p:panelGrid columns="2" styleClass="ui-noborder">
+                                <p:outputLabel value="Número ID:"/>
+                                <p:inputText value="#{usuarioBean.nuevoUsuario.numide}" required="true"/>
+
+                                <p:outputLabel value="Nombre:"/>
+                                <p:inputText value="#{usuarioBean.nuevoUsuario.nombre}" required="true"/>
+
+                                <p:outputLabel value="Apellidos:"/>
+                                <p:inputText value="#{usuarioBean.nuevoUsuario.apellidos}" required="true"/>
+
+                                <p:outputLabel value="Correo:"/>
+                                <p:inputText value="#{usuarioBean.nuevoUsuario.correo}" required="true"/>
+
+                                <p:outputLabel value="Teléfono:"/>
+                                <p:inputText value="#{usuarioBean.nuevoUsuario.telefono}"/>
+
+                                <p:outputLabel value="Contraseña:"/>
+                                <p:password value="#{usuarioBean.nuevoUsuario.contrasena}" required="true"/>
+
+                                <p:outputLabel value="Rol:"/>
+                                <p:selectOneMenu value="#{usuarioBean.nuevoUsuario.rol}">
+                                    <f:selectItem itemLabel="Usuario" itemValue="usuario"/>
+                                    <f:selectItem itemLabel="Administrador" itemValue="admin"/>
+                                </p:selectOneMenu>
+                            </p:panelGrid>
+
+                            <div style="text-align: right; margin-top: 20px;">
+                                <p:commandButton value="Cancelar" 
+                                               onclick="PF('dialogNuevoUsuario').hide()" 
+                                               type="button"
+                                               styleClass="ui-button-secondary"/>
+                                <p:commandButton value="Guardar" 
+                                               action="#{usuarioBean.guardarNuevo}"
+                                               update=":formUsuarios:tablaUsuarios :formUsuarios:messages"
+                                               oncomplete="if (args.validationFailed == false) PF('dialogNuevoUsuario').hide()"
+                                               styleClass="ui-button-success"/>
+                            </div>
+                        </h:form>
+                    </p:dialog>
+
+                    <!-- Diálogo editar usuario -->
+                    <p:dialog header="Editar Usuario" 
+                              widgetVar="dialogEditarUsuario" 
+                              modal="true" 
+                              width="600"
+                              showEffect="fade">
+                        <h:form id="formEditar">
+                            <p:panelGrid columns="2" styleClass="ui-noborder">
+                                <p:outputLabel value="ID:"/>
+                                <p:inputText value="#{usuarioBean.usuarioSeleccionado.idUsuario}" disabled="true"/>
+
+                                <p:outputLabel value="Número ID:"/>
+                                <p:inputText value="#{usuarioBean.usuarioSeleccionado.numide}" required="true"/>
+
+                                <p:outputLabel value="Nombre:"/>
+                                <p:inputText value="#{usuarioBean.usuarioSeleccionado.nombre}" required="true"/>
+
+                                <p:outputLabel value="Apellidos:"/>
+                                <p:inputText value="#{usuarioBean.usuarioSeleccionado.apellidos}" required="true"/>
+
+                                <p:outputLabel value="Correo:"/>
+                                <p:inputText value="#{usuarioBean.usuarioSeleccionado.correo}" required="true"/>
+
+                                <p:outputLabel value="Teléfono:"/>
+                                <p:inputText value="#{usuarioBean.usuarioSeleccionado.telefono}"/>
+
+                                <p:outputLabel value="Rol:"/>
+                                <p:selectOneMenu value="#{usuarioBean.usuarioSeleccionado.rol}">
+                                    <f:selectItem itemLabel="Usuario" itemValue="usuario"/>
+                                    <f:selectItem itemLabel="Administrador" itemValue="admin"/>
+                                </p:selectOneMenu>
+                            </p:panelGrid>
+
+                            <div style="text-align: right; margin-top: 20px;">
+                                <p:commandButton value="Cancelar" 
+                                               onclick="PF('dialogEditarUsuario').hide()" 
+                                               type="button"
+                                               styleClass="ui-button-secondary"/>
+                                <p:commandButton value="Actualizar" 
+                                               action="#{usuarioBean.actualizar}"
+                                               update=":formUsuarios:tablaUsuarios :formUsuarios:messages"
+                                               oncomplete="if (args.validationFailed == false) PF('dialogEditarUsuario').hide()"
+                                               styleClass="ui-button-success"/>
+                            </div>
+                        </h:form>
+                    </p:dialog>
+
+                </h:form>
+            </div>
+        </div>
+    </h:body>
+</html>

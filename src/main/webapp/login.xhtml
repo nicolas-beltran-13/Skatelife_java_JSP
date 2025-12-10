@@ -1,0 +1,382 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
+<h:head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Iniciar Sesión - Skatelife</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
+    <h:outputStylesheet>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+        }
+
+        .auth-container {
+            width: 100%;
+            max-width: 450px;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+            animation: slideUp 0.5s ease-out;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .auth-header {
+            background: linear-gradient(135deg, #d4a5a5 0%, #c59090 100%);
+            padding: 3rem 2rem;
+            text-align: center;
+            color: white;
+        }
+
+        .auth-header i {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            display: block;
+        }
+
+        .auth-header h2 {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .auth-header p {
+            font-size: 0.95rem;
+            opacity: 0.9;
+        }
+
+        .auth-body {
+            padding: 2.5rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: #333;
+            font-weight: 500;
+            font-size: 0.95rem;
+        }
+
+        .input-wrapper {
+            position: relative;
+        }
+
+        .input-wrapper i {
+            position: absolute;
+            left: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #999;
+            font-size: 1.1rem;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 0.9rem 1rem 0.9rem 3rem;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 0.95rem;
+            transition: all 0.3s;
+            font-family: inherit;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: #d4a5a5;
+            box-shadow: 0 0 0 3px rgba(212, 165, 165, 0.1);
+        }
+
+        .form-options {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            font-size: 0.9rem;
+        }
+
+        .remember-me {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .remember-me input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+        }
+
+        .forgot-link {
+            color: #d4a5a5;
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s;
+        }
+
+        .forgot-link:hover {
+            color: #c59090;
+        }
+
+        .btn-primary {
+            width: 100%;
+            padding: 1rem;
+            background: linear-gradient(135deg, #d4a5a5 0%, #c59090 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 4px 15px rgba(212, 165, 165, 0.4);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(212, 165, 165, 0.5);
+        }
+
+        .btn-primary:active {
+            transform: translateY(0);
+        }
+
+        .divider {
+            display: flex;
+            align-items: center;
+            margin: 2rem 0;
+            color: #999;
+            font-size: 0.9rem;
+        }
+
+        .divider::before,
+        .divider::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: #e0e0e0;
+        }
+
+        .divider span {
+            padding: 0 1rem;
+        }
+
+        .social-login {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .btn-social {
+            padding: 0.8rem;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            background: white;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        .btn-social:hover {
+            border-color: #d4a5a5;
+            background: #fafafa;
+        }
+
+        .btn-social i {
+            font-size: 1.2rem;
+        }
+
+        .btn-google {
+            color: #db4437;
+        }
+
+        .btn-facebook {
+            color: #4267B2;
+        }
+
+        .auth-footer {
+            text-align: center;
+            padding: 1.5rem;
+            background: #f8f8f8;
+            color: #666;
+            font-size: 0.95rem;
+        }
+
+        .auth-footer a {
+            color: #d4a5a5;
+            text-decoration: none;
+            font-weight: 600;
+            transition: color 0.3s;
+        }
+
+        .auth-footer a:hover {
+            color: #c59090;
+        }
+
+        .back-home {
+            display: inline-block;
+            margin-bottom: 1.5rem;
+            color: white;
+            text-decoration: none;
+            font-size: 0.95rem;
+            transition: opacity 0.3s;
+        }
+
+        .back-home:hover {
+            opacity: 0.8;
+        }
+
+        .back-home i {
+            margin-right: 0.5rem;
+        }
+
+        .alert {
+            padding: 1rem;
+            border-radius: 10px;
+            margin-bottom: 1.5rem;
+            font-size: 0.9rem;
+        }
+
+        .alert-error {
+            background: #fee;
+            color: #c33;
+            border: 1px solid #fcc;
+        }
+
+        .alert-success {
+            background: #efe;
+            color: #3c3;
+            border: 1px solid #cfc;
+        }
+
+        @media (max-width: 480px) {
+            .auth-container {
+                border-radius: 0;
+            }
+
+            .auth-body {
+                padding: 1.5rem;
+            }
+
+            .social-login {
+                grid-template-columns: 1fr;
+            }
+        }
+    </h:outputStylesheet>
+</h:head>
+<h:body>
+    <div style="width: 100%; max-width: 450px;">
+        <h:link outcome="index" styleClass="back-home">
+            <i class="fas fa-arrow-left"></i> Volver a inicio
+        </h:link>
+
+        <div class="auth-container">
+            <div class="auth-header">
+                <i class="fas fa-skating"></i>
+                <h2>Iniciar Sesión</h2>
+                <p>Bienvenido de nuevo a Skatelife</p>
+            </div>
+
+            <div class="auth-body">
+                <h:form id="loginForm">
+                    <!-- Mensaje de error -->
+                    <h:panelGroup rendered="#{loginBean.showError}">
+                        <div class="alert alert-error">
+                            <i class="fas fa-exclamation-circle"></i>
+                            #{loginBean.errorMessage}
+                        </div>
+                    </h:panelGroup>
+
+                    <!-- Mensaje de éxito -->
+                    <h:panelGroup rendered="#{loginBean.showSuccess}">
+                        <div class="alert alert-success">
+                            <i class="fas fa-check-circle"></i>
+                            #{loginBean.successMessage}
+                        </div>
+                    </h:panelGroup>
+
+                    <div class="form-group">
+                        <label for="email">Correo Electrónico</label>
+                        <div class="input-wrapper">
+                            <i class="fas fa-envelope"></i>
+                            <h:inputText id="email" 
+                                        value="#{loginBean.email}" 
+                                        styleClass="form-control"
+                                        required="true"
+                                        requiredMessage="El correo es obligatorio"
+                                        validatorMessage="Correo electrónico inválido">
+                                <f:validateRegex pattern="[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}"/>
+                            </h:inputText>
+                        </div>
+                        <h:message for="email" style="color: #c33; font-size: 0.85rem; margin-top: 0.3rem; display: block;"/>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="password">Contraseña</label>
+                        <div class="input-wrapper">
+                            <i class="fas fa-lock"></i>
+                            <h:inputSecret id="password" 
+                                          value="#{loginBean.password}" 
+                                          styleClass="form-control"
+                                          required="true"
+                                          requiredMessage="La contraseña es obligatoria"/>
+                        </div>
+                        <h:message for="password" style="color: #c33; font-size: 0.85rem; margin-top: 0.3rem; display: block;"/>
+                    </div>
+
+                    <div class="form-options">
+                        <div class="remember-me">
+                            <h:selectBooleanCheckbox id="remember" value="#{loginBean.rememberMe}"/>
+                            <label for="remember" style="margin: 0; font-weight: 400;">Recordarme</label>
+                        </div>
+                        <h:link outcome="recuperar-password" styleClass="forgot-link" value="¿Olvidaste tu contraseña?"/>
+                    </div>
+
+                    <h:commandButton value="Iniciar Sesión" 
+                                    action="#{loginBean.login}" 
+                                    styleClass="btn-primary"/>
+                </h:form>
+            </div>
+
+            <div class="auth-footer">
+                ¿No tienes una cuenta? 
+                <h:link outcome="registro" value="Regístrate aquí"/>
+            </div>
+        </div>
+    </div>
+</h:body>
+</html>

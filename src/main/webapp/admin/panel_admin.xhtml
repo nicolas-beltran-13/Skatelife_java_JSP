@@ -1,15 +1,321 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!--
-Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
-Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/XHtml.xhtml to edit this template
--->
 <!DOCTYPE html>
-<html xmlns="http://www.w3.org/1999/xhtml">
-    <head>
-        <title>TODO supply a title</title>
-        <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-    </head>
-    <body>
-        <div>TODO write content</div>
-    </body>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui">
+
+<h:head>
+    <title>Reportes y Estadísticas - Skatelife Admin</title>
+    <h:outputStylesheet library="css" name="admin.css"/>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f5f5f5;
+            overflow: hidden;
+        }
+
+        .admin-container {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        .sidebar {
+            width: 200px;
+            background: linear-gradient(180deg, #2c5f7c 0%, #1e4158 100%);
+            color: white;
+            padding: 0;
+            box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+            position: sticky;
+            top: 0;
+            height: 100vh;
+            overflow-y: auto;
+        }
+
+        .sidebar h2 {
+            padding: 2rem 1.5rem;
+            font-size: 1.3rem;
+            font-weight: 600;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .menu {
+            list-style: none;
+            padding: 1rem 0;
+        }
+
+        .menu li {
+            margin: 0.3rem 0;
+        }
+
+        .menu li a,
+        .menu li .logout-btn {
+            display: block;
+            padding: 0.9rem 1.5rem;
+            color: rgba(255,255,255,0.8);
+            text-decoration: none;
+            transition: all 0.3s;
+            font-size: 0.95rem;
+        }
+
+        .menu li:hover a,
+        .menu li.active a,
+        .logout-btn:hover {
+            background: rgba(255,255,255,0.1);
+            color: white;
+            border-left: 4px solid #ff5252;
+            padding-left: calc(1.5rem - 4px);
+        }
+
+        .main-content {
+            flex: 1;
+            padding: 2rem 3rem;
+            overflow-y: auto;
+            overflow-x: hidden;
+            max-height: 100vh;
+        }
+    </style>
+</h:head>
+
+<h:body>
+    <div class="admin-container">
+
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <h2>Skatelife Admin</h2>
+
+            <ul class="menu">
+                <li>
+                    <h:link value="Panel" outcome="/admin/panel_admin"/>
+                </li>
+                <li>
+                    <h:link value="Productos" outcome="/admin/productos"/>
+                </li>
+                <li>
+                    <h:link value="Usuarios" outcome="/admin/usuarios"/>
+                </li>
+
+                <!-- Cerrar sesión -->
+                <li style="margin-top: 1rem; border-top: 1px solid rgba(255,255,255,0.2); padding-top: 1rem;">
+                    <h:form>
+                        <h:commandLink value="Cerrar sesión"
+                                       action="#{sessionBean.logout}"
+                                       styleClass="logout-btn"
+                                       onclick="return confirm('¿Deseas cerrar sesión?');"/>
+                    </h:form>
+                </li>
+            </ul>
+        </div>
+
+        <!-- Contenido principal -->
+        <div class="main-content">
+            <h:form id="formReportes">
+                <p:growl id="messages" showDetail="true" life="3000"/>
+
+                <!-- Encabezado -->
+                <div class="page-header">
+                    <div>
+                        <h1>
+                            <i class="pi pi-chart-bar" style="margin-right: 0.5rem;"></i>
+                            Reportes y Estadísticas
+                        </h1>
+                        <p class="page-subtitle">Análisis detallado de ventas, productos y usuarios</p>
+                    </div>
+
+                    <div class="export-buttons">
+                        <p:commandButton value="Exportar PDF"
+                                         icon="pi pi-file-pdf"
+                                         styleClass="btn-export btn-pdf"
+                                         ajax="false">
+                            <p:dataExporter type="pdf" target="tablaReportes" fileName="reporte-skatelife"/>
+                        </p:commandButton>
+
+                        <p:commandButton value="Exportar Excel"
+                                         icon="pi pi-file-excel"
+                                         styleClass="btn-export btn-excel"
+                                         ajax="false">
+                            <p:dataExporter type="xls" target="tablaReportes" fileName="reporte-skatelife"/>
+                        </p:commandButton>
+                    </div>
+                </div>
+
+                <!-- Filtros -->
+                <div class="filter-section">
+                    <h3>
+                        <i class="pi pi-filter"></i>
+                        Filtros de Reporte
+                    </h3>
+
+                    <div class="filter-grid">
+                        <div class="filter-field">
+                            <label>Fecha Inicio</label>
+                            <p:calendar value="#{reporteBean.fechaInicio}"
+                                        pattern="dd/MM/yyyy"
+                                        placeholder="Seleccione fecha"/>
+                        </div>
+
+                        <div class="filter-field">
+                            <label>Fecha Fin</label>
+                            <p:calendar value="#{reporteBean.fechaFin}"
+                                        pattern="dd/MM/yyyy"
+                                        placeholder="Seleccione fecha"/>
+                        </div>
+
+                        <div class="filter-field">
+                            <label>Categoría</label>
+                            <p:selectOneMenu value="#{reporteBean.categoriaSeleccionada}">
+                                <f:selectItem itemLabel="Todas las categorías" itemValue=""/>
+                                <f:selectItem itemLabel="Tablas" itemValue="tablas"/>
+                                <f:selectItem itemLabel="Ruedas" itemValue="ruedas"/>
+                                <f:selectItem itemLabel="Trucks" itemValue="trucks"/>
+                                <f:selectItem itemLabel="Accesorios" itemValue="accesorios"/>
+                                <f:selectItem itemLabel="Ropa" itemValue="ropa"/>
+                            </p:selectOneMenu>
+                        </div>
+
+                        <div class="filter-field" style="display: flex; align-items: flex-end;">
+                            <p:commandButton value="Generar Reporte"
+                                             icon="pi pi-refresh"
+                                             update="formReportes"
+                                             action="#{reporteBean.generarReporte}"
+                                             style="width: 100%; padding: 0.75rem; background: #2c5f7c; color: white; border: none; border-radius: 6px; font-weight: 500;"/>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Estadísticas -->
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-icon blue">
+                            <i class="pi pi-shopping-cart"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3>$#{reporteBean.ventasTotales != null ? reporteBean.ventasTotales : '0'}</h3>
+                            <p>Ventas Totales</p>
+                        </div>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="stat-icon green">
+                            <i class="pi pi-box"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3>#{reporteBean.productosVendidos != null ? reporteBean.productosVendidos : '0'}</h3>
+                            <p>Productos Vendidos</p>
+                        </div>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="stat-icon orange">
+                            <i class="pi pi-users"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3>#{reporteBean.nuevosClientes != null ? reporteBean.nuevosClientes : '0'}</h3>
+                            <p>Nuevos Clientes</p>
+                        </div>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="stat-icon teal">
+                            <i class="pi pi-chart-line"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3>#{reporteBean.ticketPromedio != null ? reporteBean.ticketPromedio : '0'}%</h3>
+                            <p>Crecimiento</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Gráficos -->
+                <div class="charts-grid">
+                    <div class="chart-card">
+                        <h3>
+                            <i class="pi pi-chart-line"></i>
+                            Ventas Mensuales
+                        </h3>
+                        <p:lineChart model="#{reporteBean.lineModel}" style="height: 300px;"/>
+                    </div>
+
+                    <div class="chart-card">
+                        <h3>
+                            <i class="pi pi-chart-pie"></i>
+                            Ventas por Categoría
+                        </h3>
+                        <p:pieChart model="#{reporteBean.pieModel}" style="height: 300px;"/>
+                    </div>
+
+                    <div class="chart-card full-width-chart">
+                        <h3>
+                            <i class="pi pi-chart-bar"></i>
+                            Top 10 Productos Más Vendidos
+                        </h3>
+                        <p:barChart model="#{reporteBean.barModel}" style="height: 350px;"/>
+                    </div>
+                </div>
+
+                <!-- Tabla -->
+                <div class="table-section">
+                    <h3>
+                        <i class="pi pi-list"></i>
+                        Detalle de Ventas por Producto
+                    </h3>
+
+                    <p:dataTable id="tablaReportes"
+                                 value="#{reporteBean.reporteProductos}"
+                                 var="producto"
+                                 paginator="true"
+                                 rows="10"
+                                 rowsPerPageTemplate="10,20,50"
+                                 styleClass="data-table">
+
+                        <p:column headerText="Producto" sortBy="#{producto.nombre}">
+                            <h:outputText value="#{producto.nombre}" style="font-weight: 600;"/>
+                        </p:column>
+
+                        <p:column headerText="Categoría" sortBy="#{producto.categoria}">
+                            <h:outputText value="#{producto.categoria}"/>
+                        </p:column>
+
+                        <p:column headerText="Unidades Vendidas" sortBy="#{producto.unidadesVendidas}">
+                            <h:outputText value="#{producto.unidadesVendidas}"/>
+                        </p:column>
+
+                        <p:column headerText="Precio Unitario">
+                            <h:outputText value="$#{producto.precioUnitario}">
+                                <f:convertNumber pattern="#,##0.00"/>
+                            </h:outputText>
+                        </p:column>
+
+                        <p:column headerText="Total Ventas" sortBy="#{producto.totalVentas}">
+                            <h:outputText value="$#{producto.totalVentas}" style="font-weight: 600;">
+                                <f:convertNumber pattern="#,##0.00"/>
+                            </h:outputText>
+                        </p:column>
+
+                        <p:column headerText="Stock Actual" sortBy="#{producto.stockActual}">
+                            <h:outputText value="#{producto.stockActual}"
+                                          style="color: #{producto.stockActual lt 10 ? '#dc3545' : '#28a745'}; font-weight: 600;"/>
+                        </p:column>
+
+                        <p:column headerText="Tendencia">
+                            <h:outputText value="↑ #{producto.crecimiento}%" 
+                                          styleClass="trend-up"
+                                          rendered="#{producto.crecimiento ge 0}"/>
+                            <h:outputText value="↓ #{producto.crecimiento}%" 
+                                          styleClass="trend-down"
+                                          rendered="#{producto.crecimiento lt 0}"/>
+                        </p:column>
+                    </p:dataTable>
+                </div>
+
+            </h:form>
+        </div>
+    </div>
+</h:body>
 </html>
